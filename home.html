@@ -16,59 +16,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <p class="h4">Ismadoro
-                <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
-                    class="d-inline-block align-text-bottom">
-                </img>
-                </p>
-                <p class="h6">Find Volleyball matches near you!</p>
-            </a>
-            <form class="nav-search-size">
-                <input class="form-control nav-search-bar-pos" type="search" placeholder="Search" aria-label="Search">
-                <div class="nav-search-buttons">
-                    <div class="mb-3">
-                        <button class="btn btn-outline-success" type="submit">Players</button>
-                    </div>
-                    <div>
-                        <button class="btn btn-outline-success" type="submit">Events</button>
-                    </div>
-                </div>
-            </form>
-            
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu dropdown-menu-end dropdown-pos">
-                    <p class="u-center-text">Sign up today and start finding volleyball games near you!</p>
-                    <div class="dropdown-divider"></div>
-                    <form class="px-4 py-3">
-                        <div class="mb-3">
-                            <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="exampleDropdownFormEmail1"
-                                placeholder="email@example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="exampleDropdownFormPassword1"
-                                placeholder="Password">
-                        </div>
-                        <div class="u-center-text mb-3">
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-                        <div class="u-center-text mb-3">
-                            <button type="submit" class="btn btn-primary">Sign up</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+    <div id="navbar-container"></div>
     <h1 class="u-center-text u-margin-bottom-small">Featured Events</h1>
 
     <table class="table table-dark table-striped">
@@ -112,5 +60,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
+    <!-- Navbar Setup -->
+    <script src="scripts/navbar.js"></script>
 </body>
 </html>

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!--Custom CSS-->
+    <link href="../css/style.comp.css" rel="stylesheet">
+
+    <title>Your Profile</title>
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+    <ul class="nav nav-tabs nav-fill mt-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                <h2>Profile</h2>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#event" type="button" role="tab" aria-controls="event" aria-selected="false">
+                <h2>Events</h2>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+                <h2>Settings</h2>
+            </button>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="row justify-content-evenly mt-3">
+                <div class="col-3"> 
+                    <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
+                    class="d-inline-block">
+                    <h2 class="mt-3 mb-3">Email Address</h2>
+                    <h2 class="mb-3">Phone Number</h2>
+                    <h2>City, State</h2>
+                </div>
+                <div class="col-3">
+                    <h2 class="mb-5">FirstName  LastName<h2>
+                    <h2 class="mb-3">Bio:</h2>
+                    <p>My bio goes here, sorry its so short?<p>
+                </div>
+                <div class="col-3">  
+                    <h2 class="mb-3">Recent Events:</h2>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+            <div class="row">
+                <div class="col">
+                    <h2 class="mb-3 mt-3 text-center">Events you Created</h2>
+                    <table class="table table-dark table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Skill</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>John</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>New York</td>
+                            <td>Chicago</td>
+                            <td>Florida</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Beginner</td>
+                            <td>Intermediate</td>
+                            <td>Master</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">4</th>
+                            <td>3-25-2020</td>
+                            <td>12-10-2020</td>
+                            <td>10-6-2020</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center mt-3">
+                        <button type="submit" id="button-submit" class="btn btn-primary">New Event</button>
+                    </div>
+                </div>
+                <div class="col">
+                    <h2 class="mb-3 mt-3 text-center">Events you Registered for</h2>
+                    <table class="table table-dark table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Skill</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                            <td>John</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>New York</td>
+                            <td>Chicago</td>
+                            <td>Florida</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Beginner</td>
+                            <td>Intermediate</td>
+                            <td>Master</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">4</th>
+                            <td>3-25-2020</td>
+                            <td>12-10-2020</td>
+                            <td>10-6-2020</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+            <div class="row justify-content-evenly mt-3">
+                <div class="col-3">
+                    <h2>Update Profile Info</h2>
+                    <div class="row justify-content-center mt-3">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary" id="profile-pic-button">New Profile Pic</button>
+                        </div>
+                    </div> 
+                    <form >
+                        <div class="row g-3 mt-4 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputCity" class="col-form-label">City</label>
+                            </div>
+                            <div class="col-4">
+                                <input type="text" class="form-control" id="InputCity">
+                            </div>
+                            <div class="col-auto">
+                                <label for="InputState" class="col-form-label">State</label>
+                            </div>
+                            <div class="col-2">
+                                <input type="text" class="form-control" id="InputState">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-4 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputEmail" class="col-form-label">Email</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="email" class="form-control" id="InputEmail">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-4 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputPhone" class="col-form-label">Phone</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" id="InputPhone">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary" id="update-button">Update</button>
+                        </div>
+                    </div> 
+                </div>
+                <div class="col-3">
+                    <h2>Profile Visibility</h2>
+                    <div class="row justify-content-center mt-5">
+                        <div class="col">
+                            <button type="submit" id="button-public" class="btn btn-primary">Public</button>
+                        </div>
+                        <div class="col">
+                            <button type="submit" id="button-private" class="btn btn-primary">Private</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <h2>Close Account</h2>
+                    <p class="mt-5">If you no longer need your Ismadoro account, you can choose to delete it using the button below. 
+                       This cannot be undone so be careful!
+                    <p>
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary" id="delete-button">Close Account</button>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+      </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <!-- Navbar Setup -->
+    <script src="../scripts/navbar.js"></script>
+</body>

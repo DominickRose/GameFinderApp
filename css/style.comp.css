@@ -30,6 +30,12 @@
     .u-margin-top-big {
       margin-top: 5rem; } }
 
+.u-margin-top-med {
+  margin-top: 4rem; }
+  @media only screen and (max-width: 56.25em) {
+    .u-margin-bottom-med {
+      margin-top: 3rem; } }
+
 .u-margin-top-small {
   margin-top: 2rem; }
 
