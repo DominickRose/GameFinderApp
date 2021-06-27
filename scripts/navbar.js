@@ -1,21 +1,77 @@
 
 const navbarContainerDOM = document.getElementById("navbar-container");
 let dropdownContainerDOM;
-let isLoggedIn = false;
+let usernameLoginInputDOM;
+let passwordLoginInputDOM;
+let loginErrorDOM;
+
+//API Calls
+async function login(e) {
+    e.preventDefault();
+    //Exit if any of these fields are empty
+    if(!usernameLoginInputDOM.value || !passwordLoginInputDOM.value) {
+        loginErrorDOM.innerText = "Please fill out all fields";
+        return;
+    }
+    const response = await fetch(`http://127.0.0.1:7000/players/login`, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            'username': usernameLoginInputDOM.value,
+            'password': passwordLoginInputDOM.value
+        })
+    });
+    if (response.ok) {
+        let user = await response.json();
+        localStorage.setItem("login-info", JSON.stringify(user));
+        window.location.href = `userProfile.html`;
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        loginErrorDOM.innerText = text;
+    }
+}
+async function logout(e) {
+    e.preventDefault();
+    //BUG - Logout route
+    /*const response = await fetch(`http://127.0.0.1:7000/players/login`, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            'username': usernameLoginInputDOM.value,
+            'password': passwordLoginInputDOM.value
+        })
+    });
+    */
+    localStorage.removeItem("login-info");
+    window.location.href = `home.html`;
+}
 
 function createLoginDropDown() {
     dropdownContainerDOM.innerHTML = `
     <p class="u-center-text">Sign up today and start finding volleyball games near you!</p>
     <div class="dropdown-divider"></div>
     <form class="px-4 py-3">
+        <label class="form-label u-color-red mb-1" id="login-error"></label>
         <div class="mb-3">
-            <label for="exampleDropdownFormEmail1" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="exampleDropdownFormEmail1"
-                placeholder="email@example.com">
+            <label for="username-input" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username-input"
+                placeholder="Username">
         </div>
         <div class="mb-3">
-            <label for="exampleDropdownFormPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="exampleDropdownFormPassword1"
+            <label for="password-input" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password-input"
                 placeholder="Password">
         </div>
         <div class="u-center-text mb-3">
@@ -26,20 +82,24 @@ function createLoginDropDown() {
         </div>
     </form>
     `;
-    document.getElementById("login-button").addEventListener('click', (e) => { 
+    document.getElementById("login-button").addEventListener('click', login);
+    document.getElementById("sign-up-button").addEventListener('click', (e) => {
         e.preventDefault();
-        isLoggedIn = true; 
-        updateDropdownContainer();
+        window.location.href = `createUser.html`;
     });
+    loginErrorDOM = document.getElementById("login-error");
+    usernameLoginInputDOM = document.getElementById("username-input");
+    passwordLoginInputDOM = document.getElementById("password-input");
 }
 
-function createUserDropDown(name) {
+function createUserDropDown() {
+    const user = JSON.parse(localStorage.getItem("login-info"));
     dropdownContainerDOM.innerHTML = `
     <p class="u-center-text">
         <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
         class="d-inline-block">
         </img>
-        ${name}
+        ${user.firstName + " " + user.lastName}
     </p>
     <div class="dropdown-divider"></div>
     <form class="px-4 py-3">
@@ -54,22 +114,27 @@ function createUserDropDown(name) {
         </div>
     </form>
     `;
-    document.getElementById("logout-button").addEventListener('click', (e) => { 
+    document.getElementById("my-events-button").addEventListener('click', (e) => {
         e.preventDefault();
-        isLoggedIn = false; 
-        updateDropdownContainer();
+        window.location.href = `userProfile.html`;
     });
+    document.getElementById("new-event-button").addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = `createEvent.html`;
+    });
+    document.getElementById("logout-button").addEventListener('click', logout);
 }
 
 function updateDropdownContainer() {
-    isLoggedIn ? createUserDropDown("John David") : createLoginDropDown();
+    const user = localStorage.getItem("login-info");
+    user ? createUserDropDown() : createLoginDropDown();
 }
 
 function createNavBar() {
     navbarContainerDOM.innerHTML = `
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="home.html">
                 <p class="h4">Ismadoro
                 <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
                     class="d-inline-block align-text-bottom">
@@ -91,7 +156,7 @@ function createNavBar() {
             
             <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                     More
                 </button>
                 <div id="dropdown-container" class="dropdown-menu dropdown-menu-end dropdown-pos">
