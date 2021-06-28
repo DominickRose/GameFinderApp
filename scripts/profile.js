@@ -1,5 +1,6 @@
-//BUG - check if user is viewing thier profile or someone else
-//BUG - This is written assuming the user is logged in
+//DOM Object - Profile Tabs
+const settingsTabDOM = document.getElementById("settings-tab");
+const eventTabDOM = document.getElementById("event-tab");
 
 //DOM Objects - Profile Display
 const profileContentDOM = document.getElementById("profile");
@@ -8,6 +9,9 @@ const phoneTextDOM = document.getElementById("phone-number-text");
 const cityStateTextDOM = document.getElementById("city-state-text");
 const nameTextDOM = document.getElementById("name-text");
 const bioTextDOM = document.getElementById("bio-text");
+
+//Profile User
+let curUser = null;
 
 //DOM Objects - Update Profile
 const cityInputDOM = document.getElementById("InputCity");
@@ -30,6 +34,11 @@ flagsToInputDOM.set(phoneFlag, phoneInputDOM);
 
 //Misc
 const phoneFormat = "xxx-xxx-xxxx";
+const states = [" ", "AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC",
+                "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+                "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+                "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
+                "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY"];
 
 //DOM Objects - Visability + Close
 const publicProfileButton = document.getElementById("button-public");
@@ -77,8 +86,37 @@ function updateVisibilityText(visible) {
         visibleTextDOM.className = "u-color-red mt-3";
     }
 }
+function setupStateDropdown() {
+    let finalInnerHTML = `<option selected>${states[0]}</option>`;
+    for(let i = 1; i < states.length; ++i) {
+        finalInnerHTML += `
+         <option>${states[i]}</option>
+        `;
+    }
+    stateInputDOM.innerHTML = finalInnerHTML;
+}
 
 //API Calls
+async function getUser(userID) {
+    const response = await fetch(`http://127.0.0.1:7000/players/${userID}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        let user = await response.json();
+        return user;
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        return null;
+    }
+}
 async function updateUser(json_body) {
     const response = await fetch(`http://127.0.0.1:7000/players/${json_body.playerId}`, {
         method: 'PUT',
@@ -130,12 +168,11 @@ deleteUserButtonDOM.addEventListener('click', deleteUser);
 
 
 //Events - Settings Tab
-//BUG - possible dropdown with set options?
 cityInputDOM.addEventListener('input', () => {
     cityInputDOM.value ? turnOnFlag(cityFlag) : turnOffFlag(cityFlag);
 });
 stateInputDOM.addEventListener('input', () => {
-    stateInputDOM.value ? turnOnFlag(stateFlag) : turnOffFlag(stateFlag);
+    validateName(stateInputDOM.value, stateFlag);
 });
 
 function validateEmailInput() {
@@ -166,19 +203,17 @@ phoneInputDOM.addEventListener('input', validatePhoneInput);
 
 async function makePublic(e) {
     e.preventDefault();
-    let user = JSON.parse(localStorage.getItem("login-info"));
-    user.visible = true;
-    let result = await updateUser(user);
-    if(result === "") updateVisibilityText(user.visible);
+    curUser.visible = true;
+    let result = await updateUser(curUser);
+    if(result === "") updateVisibilityText(curUser.visible);
 }
 publicProfileButton.addEventListener('click', makePublic);
 
 async function makePrivate(e) {
     e.preventDefault();
-    let user = JSON.parse(localStorage.getItem("login-info"));
-    user.visible = false;
-    let result = await updateUser(user);
-    if(result === "") updateVisibilityText(user.visible);
+    curUser.visible = false;
+    let result = await updateUser(curUser);
+    if(result === "") updateVisibilityText(curUser.visible);
 }
 privateProfileButton.addEventListener('click', makePrivate);
 
@@ -187,12 +222,11 @@ async function updateProfile(e) {
     if(!isAllFlagsOn()) {
         return;
     }
-    let user = JSON.parse(localStorage.getItem("login-info"));
-    user.state = stateInputDOM.value;
-    user.city = cityInputDOM.value;
-    user.email = emailInputDOM.value;
-    user.phoneNumber = phoneInputDOM.value;
-    let result = await updateUser(user);
+    curUser.state = stateInputDOM.value;
+    curUser.city = cityInputDOM.value;
+    curUser.email = emailInputDOM.value;
+    curUser.phoneNumber = phoneInputDOM.value;
+    let result = await updateUser(curUser);
     if(result === "") initUserProfile();
 }
 updateProfileButton.addEventListener('click', updateProfile);
@@ -202,25 +236,66 @@ newEventButtonDOM.addEventListener('click', (e) => {
     window.location.href = `createEvent.html`;
 });
 
-function initUserProfile() {
-    let user = JSON.parse(localStorage.getItem("login-info"));
+//Init Functions
+function setProfileText() {
     //Profile Text
-    nameTextDOM.innerText = user.firstName + " " + user.lastName;
-    emailTextDOM.innerText = user.email;
-    phoneTextDOM.innerText = user.phoneNumber;
-    cityStateTextDOM.innerText = user.city + ", " + user.state;
+    nameTextDOM.innerText = curUser.firstName + " " + curUser.lastName;
+    emailTextDOM.innerText = curUser.email;
+    phoneTextDOM.innerText = curUser.phoneNumber;
+    cityStateTextDOM.innerText = curUser.city + ", " + curUser.state;
     //BUG - bio is missing
     //BUG - Recent events are missing
+}
+function setPersonalSettings() {
     //Settings
-    updateVisibilityText(user.visible);
-    stateInputDOM.value = user.state;
+    setupStateDropdown();
+    updateVisibilityText(curUser.visible);
+    stateInputDOM.value = curUser.state;
     validateName(stateInputDOM.value, stateFlag);
-    cityInputDOM.value = user.city;
+    cityInputDOM.value = curUser.city;
     validateName(cityInputDOM.value, cityFlag);
-    emailInputDOM.value = user.email;
+    emailInputDOM.value = curUser.email;
     validateEmailInput();
-    phoneInputDOM.value = user.phoneNumber;
+    phoneInputDOM.value = curUser.phoneNumber;
     validatePhoneInput();
+}
+async function initUserProfile() {
+    //BUG - possible 404 page instead of redirect home
+    let params = new URLSearchParams(window.location.search);
+    let userId = params.get('user');
+    if(!userId) window.location.href = `home.html`;
+    //Viewing our own profile
+    if(userId === "me") {
+        curUser = JSON.parse(localStorage.getItem("login-info"));
+        if(!curUser) window.location.href = `home.html`;
+        setProfileText(); 
+        setPersonalSettings();
+    }
+    //Viewing another profile
+    else {
+        curUser = await getUser(userId);
+        if(!curUser) window.location.href = `home.html`;
+        //Clear settings
+        settingsTabDOM.disabled = true;
+        settingsTabDOM.className = "nav-link disabled";
+        document.getElementById("settings").innerHTML = "";
+        //Check for public/private profiles
+        if(curUser.visible) {
+            setProfileText();
+            //Clear new event button in events tab
+            document.getElementById("new-event-btn-container").innerHTML = ""; 
+        }
+        else {
+            //Clear events tab
+            eventTabDOM.disabled = true;
+            eventTabDOM.className = "nav-link disabled";
+            document.getElementById("event").innerHTML = "";
+            //Let viewer know that this profile is private
+            document.getElementById("profile").innerHTML = `
+            <h1 class="u-center-text u-color-red mt-5 mb-5">This users profile is private</h1>
+            `;
+        }
+    }
 }
 
 //Process

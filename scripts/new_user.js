@@ -33,6 +33,11 @@ flagsToInputDOM.set(descFlag, descInputDOM);
 
 //Misc
 const phoneFormat = "xxx-xxx-xxxx";
+const states = [" ", "AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC",
+                "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+                "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+                "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
+                "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY"];
 
 //Helpers
 function turnOffFlag(flag) {
@@ -61,6 +66,15 @@ function validateName(nameValue, nameFlag) {
     }
     turnOnFlag(nameFlag);
 }
+function setupStateDropdown() {
+    let finalInnerHTML = `<option id="state-option-none" selected>${states[0]}</option>`;
+    for(let i = 1; i < states.length; ++i) {
+        finalInnerHTML += `
+         <option id="state-option-${states[i]}">${states[i]}</option>
+        `;
+    }
+    stateInputDOM.innerHTML = finalInnerHTML;
+}
 
 //Events
 function validateFirstNameInput() {
@@ -83,8 +97,7 @@ function validateEmailInput() {
 emailInputDOM.addEventListener('input', validateEmailInput);
 
 function validateUsernameInput() {
-    //BUG - Users going to search by name or username?
-    //I don't know how to validate this
+    //Username can be anything non empty
     const usernameValue = usernameInputDOM.value;
     if(usernameValue) return turnOnFlag(usernameFlag);
     else return turnOffFlag(usernameFlag);
@@ -99,10 +112,9 @@ function validatePasswordInput() {
 passwordInputDOM.addEventListener('input', validatePasswordInput);
 
 cityInputDOM.addEventListener('input', () => {
-    //TODO - City is a string the user can enter
     validateName(cityInputDOM.value, cityFlag);
 });
-//TODO - Dropdown
+
 stateInputDOM.addEventListener('input', () => {
     validateName(stateInputDOM.value, stateFlag);
 });
@@ -174,9 +186,10 @@ async function submitNewUser(e) {
     });
     if (response.ok) {
         let user = await response.json();
-        //TODO/BUG - Automatically log the user in?
-        //window.location.href = `userProfile.html`;
-        window.location.href = `home.html`;
+        //BUG - Automatically log the user in in the backend when 
+        //account is created
+        localStorage.setItem("login-info", JSON.stringify(user));
+        window.location.href = `userProfile.html`;
     }
     else {
         let text = await response.text();
@@ -185,3 +198,6 @@ async function submitNewUser(e) {
     }
 }
 newUserButtonDOM.addEventListener('click', submitNewUser);
+
+//State Dropdown Setup
+setupStateDropdown();
