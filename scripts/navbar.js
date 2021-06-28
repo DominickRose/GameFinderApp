@@ -1,9 +1,15 @@
 
 const navbarContainerDOM = document.getElementById("navbar-container");
 let dropdownContainerDOM;
+let navbarSearchQueryDOM;
+let searchButtonDOM;
+let eventSearchOptionDOM;
+let playerSearchOptionDOM;
 let usernameLoginInputDOM;
 let passwordLoginInputDOM;
 let loginErrorDOM;
+
+let isEventSearchOption = true;
 
 //API Calls
 async function login(e) {
@@ -58,6 +64,7 @@ async function logout(e) {
     window.location.href = `home.html`;
 }
 
+//Helpers
 function createLoginDropDown() {
     dropdownContainerDOM.innerHTML = `
     <p class="u-center-text">Sign up today and start finding volleyball games near you!</p>
@@ -91,7 +98,6 @@ function createLoginDropDown() {
     usernameLoginInputDOM = document.getElementById("username-input");
     passwordLoginInputDOM = document.getElementById("password-input");
 }
-
 function createUserDropDown() {
     const user = JSON.parse(localStorage.getItem("login-info"));
     dropdownContainerDOM.innerHTML = `
@@ -116,7 +122,9 @@ function createUserDropDown() {
     `;
     document.getElementById("my-events-button").addEventListener('click', (e) => {
         e.preventDefault();
-        window.location.href = `userProfile.html`;
+        let params = new URLSearchParams();
+        params.set('user', "me");
+        window.location.href = `userProfile.html?${params.toString()}`;
     });
     document.getElementById("new-event-button").addEventListener('click', (e) => {
         e.preventDefault();
@@ -124,10 +132,13 @@ function createUserDropDown() {
     });
     document.getElementById("logout-button").addEventListener('click', logout);
 }
-
 function updateDropdownContainer() {
     const user = localStorage.getItem("login-info");
     user ? createUserDropDown() : createLoginDropDown();
+}
+function updateSearchOption() {
+    if(isEventSearchOption) searchButtonDOM.innerText = "Events";
+    else searchButtonDOM.innerText = "Players";
 }
 
 function createNavBar() {
@@ -143,14 +154,18 @@ function createNavBar() {
                 <p class="h6">Find Volleyball matches near you!</p>
             </a>
             <form class="nav-search-size">
-                <input class="form-control nav-search-bar-pos" type="search" placeholder="Search" aria-label="Search">
-                <div class="nav-search-buttons">
-                    <div class="mb-3">
-                        <button class="btn btn-outline-success" type="submit">Players</button>
-                    </div>
-                    <div>
-                        <button class="btn btn-outline-success" type="submit">Events</button>
-                    </div>
+                <input id="navbar-search-query" class="form-control nav-search-bar-pos" type="search" 
+                placeholder="Search" aria-label="Search">
+                <div class="btn-group">
+                    <button id="navbar-search" type="button" class="btn btn-secondary">Events</button>
+                    <button id="navbar-search-option" type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split"
+                     data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a id="event-search-option" class="dropdown-item active">Events</a></li>
+                        <li><a id="player-search-option" class="dropdown-item">Players</a></li>
+                    </ul>
                 </div>
             </form>
             
@@ -166,6 +181,32 @@ function createNavBar() {
     </nav>
     `;
     dropdownContainerDOM = document.getElementById("dropdown-container");
+    navbarSearchQueryDOM = document.getElementById("navbar-search-query");
+    searchButtonDOM = document.getElementById("navbar-search");
+    searchButtonDOM.addEventListener('click', (e) => {
+        e.preventDefault();
+        let params = new URLSearchParams();
+        params.set('isEvent', isEventSearchOption);
+        params.set('query', navbarSearchQueryDOM.value);
+        window.location.href = `searchResults.html?${params.toString()}`;
+    });
+
+    eventSearchOptionDOM = document.getElementById("event-search-option");
+    playerSearchOptionDOM = document.getElementById("player-search-option");
+    eventSearchOptionDOM.addEventListener('click', (e) => {
+        e.preventDefault();
+        isEventSearchOption = true;
+        playerSearchOptionDOM.className = "dropdown-item";
+        eventSearchOptionDOM.className = "dropdown-item active";
+        updateSearchOption();
+    });
+    playerSearchOptionDOM.addEventListener('click', (e) => {
+        e.preventDefault();
+        isEventSearchOption = false;
+        playerSearchOptionDOM.className = "dropdown-item active";
+        eventSearchOptionDOM.className = "dropdown-item";
+        updateSearchOption();
+    });
     updateDropdownContainer(); 
 }
 

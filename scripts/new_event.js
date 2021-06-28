@@ -32,11 +32,48 @@ flagsToInputDOM.set(whenFlag, whenInputDOM);
 flagsToInputDOM.set(skillFlag, skillInputDOM);
 flagsToInputDOM.set(descFlag, descInputDOM);
 
-//Misc - Can be AM or PM
+//Misc 
+const states = [" ", "AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC",
+                "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+                "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+                "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
+                "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY"];
+const skillLevels = [" ", "Beginner", "Intermediate", "Expert"];
+const types = [" ", "2-on-2", "3-on-3", "4-on-4", "6-on-6"];
+//Can be AM or PM
 const whenFormat = "MM/DD/YYYY:HH:MM AM";
 const monthToDays =      [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const monthToTotalDays = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 let numInputTime = 0;
+
+//Dropdown setups
+function setupStateDropdown() {
+    let finalInnerHTML = `<option id="state-option-none" selected>${states[0]}</option>`;
+    for(let i = 1; i < states.length; ++i) {
+        finalInnerHTML += `
+         <option id="state-option-${states[i]}">${states[i]}</option>
+        `;
+    }
+    stateInputDOM.innerHTML = finalInnerHTML;
+}
+function setupSkillDropdown() {
+    let finalInnerHTML = `<option id="skill-option-none" selected>${skillLevels[0]}</option>`;
+    for(let i = 1; i < skillLevels.length; ++i) {
+        finalInnerHTML += `
+         <option id="skill-option-${skillLevels[i]}">${skillLevels[i]}</option>
+        `;
+    }
+    skillInputDOM.innerHTML = finalInnerHTML;
+}
+function setupTypeDropdown() {
+    let finalInnerHTML = `<option id="type-option-none" selected>${types[0]}</option>`;
+    for(let i = 1; i < types.length; ++i) {
+        finalInnerHTML += `
+         <option id="type-option-${types[i]}">${types[i]}</option>
+        `;
+    }
+    typeInputDOM.innerHTML = finalInnerHTML;
+}
 
 //Helpers
 function turnOffFlag(flag) {
@@ -90,22 +127,13 @@ cityInputDOM.addEventListener('input', () => {
     validateName(cityInputDOM.value, cityFlag);
 });
 
-//TODO - possible dropdown with set options?
 stateInputDOM.addEventListener('input', () => {
     validateName(stateInputDOM.value, stateFlag);
 });
 skillInputDOM.addEventListener('input', () => {
-    //Beginner
-    //INterm
-    //Expert
     validateName(skillInputDOM.value, skillFlag);
 });
 
-//TODO - Dropdowns
-//6-on-6
-//4-on-4
-//3-on-3
-//2-on-2
 function validateTypeInput() {
     const typeValue = typeInputDOM.value;
     if(typeValue) return turnOnFlag(typeFlag);
@@ -186,7 +214,9 @@ whenInputDOM.addEventListener('input', validateWhenInput);
 
 eventCancelButtonDOM.addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = `userProfile.html`
+    let params = new URLSearchParams();
+    params.set('user', "me");
+    window.location.href = `userProfile.html?${params.toString()}`;
 });
 
 //API Calls
@@ -197,3 +227,8 @@ async function submitNewEvent() {
     e.preventDefault();
 }
 newEventButtonDOM.addEventListener('click', submitNewEvent);
+
+//Process
+setupStateDropdown();
+setupSkillDropdown();
+setupTypeDropdown();
