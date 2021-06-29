@@ -57,7 +57,7 @@ function isAllFlagsOn() {
 }
 function validateName(nameValue, nameFlag) {
     if(!nameValue) return turnOffFlag(nameFlag);
-
+    if(nameValue.length > 50) return turnOffFlag(nameFlag);
     //Name can only contain letters
     for(let i = 0; i < nameValue.length; ++i) {
         char = nameValue[i];
@@ -165,10 +165,7 @@ async function submitNewUser(e) {
         },
         referrerPolicy: 'no-referrer',
         //BUG - values missing in the backend
-        // city does not get set in the class
         // desc is missing entirely
-        // I passed in a string for the phone number and got a 500
-        // so catch JsonSyntaxEception
         body: JSON.stringify({
             'firstName': firstNameInputDOM.value,
             'lastName': lastNameInputDOM.value,
@@ -176,9 +173,7 @@ async function submitNewUser(e) {
             'password': passwordInputDOM.value, 
             'visible': true,
             'email': emailInputDOM.value,
-            //BUG - phoneNumber should be a string in the backend
-            //'phoneNumber': phoneInputDOM.value,
-            'phoneNumber': 123,
+            'phoneNumber': phoneInputDOM.value,
             'state': stateInputDOM.value,
             'city': cityInputDOM.value,
             'description': descInputDOM.value

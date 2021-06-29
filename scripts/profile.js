@@ -65,7 +65,7 @@ function isAllFlagsOn() {
 }
 function validateName(nameValue, nameFlag) {
     if(!nameValue) return turnOffFlag(nameFlag);
-
+    if(nameValue.length > 50) return turnOffFlag(nameFlag);
     //Name can only contain letters
     for(let i = 0; i < nameValue.length; ++i) {
         char = nameValue[i];
@@ -143,9 +143,7 @@ async function updateUser(json_body) {
 async function deleteUser(e) {
     e.preventDefault();
     if(!localStorage.getItem("login-info")) return;
-    //BUG - passed in undefined as id and got a 500
-    const user = localStorage.getItem("login-info");
-    //const user = JSON.parse(localStorage.getItem("login-info"));
+    const user = JSON.parse(localStorage.getItem("login-info"));
     const response = await fetch(`http://127.0.0.1:7000/players/${user.playerId}`, {
         method: 'DELETE',
         mode: 'cors',
