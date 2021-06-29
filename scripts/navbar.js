@@ -186,9 +186,11 @@ function createNavBar() {
     searchButtonDOM.addEventListener('click', (e) => {
         e.preventDefault();
         let params = new URLSearchParams();
-        params.set('isEvent', isEventSearchOption);
         params.set('query', navbarSearchQueryDOM.value);
-        window.location.href = `searchResults.html?${params.toString()}`;
+        if(isEventSearchOption)
+            window.location.href = `searchResults.html?${params.toString()}`;
+        else
+            window.location.href = `playerResults.html?${params.toString()}`;
     });
 
     eventSearchOptionDOM = document.getElementById("event-search-option");
