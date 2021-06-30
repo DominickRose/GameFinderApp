@@ -10,6 +10,15 @@ let passwordLoginInputDOM;
 let loginErrorDOM;
 
 let isEventSearchOption = true;
+//Helper function
+function redirectToProfile(setting) {
+    let params = new URLSearchParams();
+    params.set('user', "me");
+    //Standard let user view profile tab
+    localStorage.setItem("profileView", setting);
+    window.location.href = `userProfile.html?${params.toString()}`;
+}
+
 
 //API Calls
 async function login(e) {
@@ -35,7 +44,7 @@ async function login(e) {
     if (response.ok) {
         let user = await response.json();
         localStorage.setItem("login-info", JSON.stringify(user));
-        window.location.href = `userProfile.html`;
+        redirectToProfile(0);
     }
     else {
         let text = await response.text();
@@ -122,19 +131,12 @@ function createUserDropDown() {
     `;
     document.getElementById("nav-profile-info").addEventListener('click', (e) => {
         e.preventDefault();
-        let params = new URLSearchParams();
-        params.set('user', "me");
-        //Standard let user view profile tab
-        localStorage.setItem("profileView", 0);
-        window.location.href = `userProfile.html?${params.toString()}`;
+        redirectToProfile(0);
     });
     document.getElementById("my-events-button").addEventListener('click', (e) => {
         e.preventDefault();
-        let params = new URLSearchParams();
-        params.set('user', "me");
         //Let user view event tab
-        localStorage.setItem("profileView", 1);
-        window.location.href = `userProfile.html?${params.toString()}`;
+        redirectToProfile(1);
     });
     document.getElementById("new-event-button").addEventListener('click', (e) => {
         e.preventDefault();
