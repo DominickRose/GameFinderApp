@@ -101,7 +101,7 @@ function createLoginDropDown() {
 function createUserDropDown() {
     const user = JSON.parse(localStorage.getItem("login-info"));
     dropdownContainerDOM.innerHTML = `
-    <p class="u-center-text">
+    <p id="nav-profile-info" class="u-center-text">
         <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
         class="d-inline-block">
         </img>
@@ -120,10 +120,20 @@ function createUserDropDown() {
         </div>
     </form>
     `;
+    document.getElementById("nav-profile-info").addEventListener('click', (e) => {
+        e.preventDefault();
+        let params = new URLSearchParams();
+        params.set('user', "me");
+        //Standard let user view profile tab
+        localStorage.setItem("profileView", 0);
+        window.location.href = `userProfile.html?${params.toString()}`;
+    });
     document.getElementById("my-events-button").addEventListener('click', (e) => {
         e.preventDefault();
         let params = new URLSearchParams();
         params.set('user', "me");
+        //Let user view event tab
+        localStorage.setItem("profileView", 1);
         window.location.href = `userProfile.html?${params.toString()}`;
     });
     document.getElementById("new-event-button").addEventListener('click', (e) => {

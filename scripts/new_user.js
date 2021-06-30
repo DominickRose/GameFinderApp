@@ -38,6 +38,10 @@ const states = [" ", "AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC",
                 "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
                 "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
                 "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY"];
+const symbols = "@.";
+const specialChars = new Set(['!', '`', '~', '#', '$', '%', '^', '&', '*', '(', 
+                            ')', '+', '=', ':', ';', '"', "'", '<', ',', '>', 
+                            '?', '/', '|']);
 
 //Helpers
 function turnOffFlag(flag) {
@@ -88,11 +92,33 @@ function validateLastNameInput() {
 lastNameInputDOM.addEventListener('input', validateLastNameInput);
 
 function validateEmailInput() {
-    //BUG - To do validation but as long as non-empty
-    // it wont break any code
     const emailValue = emailInputDOM.value;
-    if(emailValue) return turnOnFlag(emailFlag);
-    else return turnOffFlag(emailFlag);
+    if(!emailValue) return turnOffFlag(emailFlag);
+    let symbolIndex = 0, i = 0;
+    
+    let funcScanToSymbol = () => {
+        for(i; i < emailValue.length; ++i) {
+            //NO special characters
+            if(specialChars.has(emailValue)) break;
+            if(emailValue[i] === symbols[symbolIndex]) {
+                ++symbolIndex;
+                ++i;
+                break;
+            }
+        }
+    };
+    //Scan until we find @ symbol
+    funcScanToSymbol();
+    //Exit if we dont find @ or current char is .
+    if(symbolIndex === 0 || emailValue[i] == symbols[symbolIndex]) 
+        return turnOffFlag(emailFlag);
+    //Scan until we find . symbol
+    funcScanToSymbol();
+    //Exit if we dont find . or reach end of 
+    if(symbolIndex === 1 || i === emailValue.length) 
+        return turnOffFlag(emailFlag);
+
+    turnOnFlag(emailFlag); 
 }
 emailInputDOM.addEventListener('input', validateEmailInput);
 
@@ -164,8 +190,7 @@ async function submitNewUser(e) {
             'Content-Type': 'application/json'
         },
         referrerPolicy: 'no-referrer',
-        //BUG - values missing in the backend
-        // desc is missing entirely
+
         body: JSON.stringify({
             'firstName': firstNameInputDOM.value,
             'lastName': lastNameInputDOM.value,
@@ -176,7 +201,7 @@ async function submitNewUser(e) {
             'phoneNumber': phoneInputDOM.value,
             'state': stateInputDOM.value,
             'city': cityInputDOM.value,
-            'description': descInputDOM.value
+            'bio': descInputDOM.value
         })
     });
     if (response.ok) {
@@ -184,7 +209,8 @@ async function submitNewUser(e) {
         //BUG - Automatically log the user in in the backend when 
         //account is created
         localStorage.setItem("login-info", JSON.stringify(user));
-        window.location.href = `userProfile.html`;
+        localStorage.setItem("profileView", 0);
+        window.location.href = `userProfile.html?user=me`;
     }
     else {
         let text = await response.text();

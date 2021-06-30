@@ -13,7 +13,8 @@ const skillInputDOM = document.getElementById("InputSkill");
 const descInputDOM = document.getElementById("floatingTextarea");
 const newEventButtonDOM = document.getElementById("button-submit");
 const eventCancelButtonDOM = document.getElementById("button-cancel");
-const newEventErrorDOM = document.getElementById("new-event-error");
+let newEventErrorDOM = document.getElementById("new-event-error");
+let eventWhenErrorDOM = document.getElementById("when-error");
 
 //Bit Flags for input
 let nameFlag = 1, numPlayFlag = 2, cityFlag = 4, stateFlag = 8;
@@ -103,7 +104,7 @@ function validateName(nameValue, nameFlag) {
     turnOnFlag(nameFlag);
 }
 function getDigit(char) {
-    if(char < '0' || char > '9') return -1000;
+    if(char < '0' || char > '9') return -10000;
     return char * 1;
 }
 
@@ -150,56 +151,82 @@ descInputDOM.addEventListener('input', validateDescInput);
 
 function validateWhenInput() {
     const whenValue = whenInputDOM.value;
-    if(whenValue.length !== whenFormat.length)
+    if(whenValue.length !== whenFormat.length) {
+        eventWhenErrorDOM.innerText = "Enter start date in this format: MM/DD/YYYY:HH:MM AM";
         return turnOffFlag(whenFlag);
+    }
 
     console.log(whenValue);
-    //BUG - Inform user exactly what went wrong  
     //Check for slashes
-    if(whenValue[2] !== '/' || whenValue[5] !== '/')
+    if(whenValue[2] !== '/' || whenValue[5] !== '/') {
+        eventWhenErrorDOM.innerText = "You're missing slashes";
         return turnOffFlag(whenFlag);
+    }
  
     //Check colons
-    if(whenValue[10] !== ':' || whenValue[13] !== ':')
+    if(whenValue[10] !== ':' || whenValue[13] !== ':') {
+        eventWhenErrorDOM.innerText = "You're missing colons";
         return turnOffFlag(whenFlag);
+    }
     
     //Check space
-    if(whenValue[16] !== ' ') return turnOffFlag(whenFlag);
+    if(whenValue[16] !== ' ') {
+        eventWhenErrorDOM.innerText = "You're missing a space before AM/PM";
+        return turnOffFlag(whenFlag);
+    }
 
     //Check AM/PM
-    if(whenValue[17] !== 'A' && whenValue[17] !== 'P')
+    if(whenValue[18] !== 'M' || (whenValue[17] !== 'A' && whenValue[17] !== 'P')) {
+        eventWhenErrorDOM.innerText = "Final two characters should be AM or PM";
         return turnOffFlag(whenFlag);
-    if(whenValue[18] !== 'M') return turnOffFlag(whenFlag);
+    }
+
 
     //Hour
     let hour = (getDigit(whenValue[11]) * 10) + getDigit(whenValue[12]);
     console.log(hour);
     //Hour must be between 1 and 12
-    if(hour < 1 || hour > 12) return turnOffFlag(whenFlag);
+    if(hour < 1 || hour > 12) {
+        eventWhenErrorDOM.innerText = "Hour must be between 1-12";
+        return turnOffFlag(whenFlag);
+    }
     if(hour === 12 && whenValue[17] === 'A') hour = 0;
     if(whenValue[17] === 'P') hour += 12;
 
     //Minute
     let minute = (getDigit(whenValue[14]) * 10) + getDigit(whenValue[15]);
     //Minute must be between 0 and 59
-    if(minute < 0 || minute > 59) return turnOffFlag(whenFlag);
+    if(minute < 0 || minute > 59) {
+        eventWhenErrorDOM.innerText = "Minute must be between 0-59";
+        return turnOffFlag(whenFlag);
+    }
 
     //Month
     let month = (getDigit(whenValue[0]) * 10) + getDigit(whenValue[1]);
     //Month must be between 1 and 12
-    if(month < 1 || month > 12) return turnOffFlag(whenFlag);
+    if(month < 1 || month > 12) {
+        eventWhenErrorDOM.innerText = "Month must be between 1-12";
+        return turnOffFlag(whenFlag);
+    }
 
     //Day
     let day = (getDigit(whenValue[3]) * 10) + getDigit(whenValue[4]);
     //Day must be within bounds depending on month
-    if(day < 1 || day > monthToDays[month]) return turnOffFlag(whenFlag);
+    if(day < 1 || day > monthToDays[month]) {
+        eventWhenErrorDOM.innerText = "Day must be between 1-"+monthToDays[month];
+        return turnOffFlag(whenFlag);
+    }
     day -= 1;
 
     //Year
-    let year = (getDigit(whenValue[6]) * 1000) + (getDigit(whenValue[7] * 100));
+    let year = (getDigit(whenValue[6]) * 1000) + (getDigit(whenValue[7]) * 100);
     year += ((getDigit(whenValue[8]) * 10) + getDigit(whenValue[9]));
-    //BUG - Users cannot post events whose dates are in the past
+    if(year < 0) {
+        eventWhenErrorDOM.innerText = "Year must be 4 digits";
+        return turnOffFlag(whenFlag);
+    }
 
+    eventWhenErrorDOM.innerText = "";
     turnOnFlag(whenFlag);
     //Convert string time to number 
     //(basically approx minutes) 
@@ -224,7 +251,10 @@ async function submitNewEvent(e) {
     e.preventDefault();
     user = localStorage.getItem("login-info");
     if(!user) return;
-    if(!isAllFlagsOn) return;
+    if(!isAllFlagsOn()) {
+        newEventErrorDOM.innerText = "Make sure all fields are filled properly!"
+        return;
+    }
     const event = {
         "ownerId":user.playerId,
 	    "eventDate":numInputTime,
@@ -243,12 +273,14 @@ async function submitNewEvent(e) {
         body: JSON.stringify(event)
     }
 
+    //BUG - Users cannot post events whose dates are in the past
     const response = await fetch("http://localhost:7000/events", config)
 
         if(response.ok){
+            let newEvent = await response.json();
             let params = new URLSearchParams();
-            params.set('user', "me");
-            window.location.href = `userProfile.html?${params.toString()}`;
+            params.set('eventId', newEvent.eventId);
+            window.location.href = `viewEvent.html?${params.toString()}`;
         }else{
             let text = await response.text();
             console.log(response.status, text);
