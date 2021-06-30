@@ -10,6 +10,9 @@ const eventContainer = document.getElementById("players-reg-container");
 
 let currentEvent;
 
+function convertNumberToDate() {
+    
+}
 function setEventview(){
     eventName.innerHTML = currentEvent.eventTitle;
     cityState.innerHTML = currentEvent.city + " " + currentEvent.state;
@@ -20,11 +23,8 @@ function setEventview(){
 }
 
 async function getEventsById(){
-    console.log(window.location.search);
     let params = new URLSearchParams(window.location.search);
-    console.log(params);
     eventId = params.get('eventId');
-    console.log(eventId);
     const response = await fetch(`http://localhost:7000/events/${eventId}`)
     let innerRows = ""
 

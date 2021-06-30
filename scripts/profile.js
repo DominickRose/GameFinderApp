@@ -4,11 +4,14 @@ const eventTabDOM = document.getElementById("event-tab");
 
 //DOM Objects - Profile Display
 const profileContentDOM = document.getElementById("profile");
+const eventContentDOM = document.getElementById("event");
+const settingsContentDOM = document.getElementById("settings");
+const bioContainerDOM = document.getElementById("bio-container");
 const emailTextDOM = document.getElementById("email-text");
 const phoneTextDOM = document.getElementById("phone-number-text");
 const cityStateTextDOM = document.getElementById("city-state-text");
 const nameTextDOM = document.getElementById("name-text");
-const bioTextDOM = document.getElementById("bio-text");
+let bioTextDOM = null;
 
 //Profile User
 let curUser = null;
@@ -18,12 +21,16 @@ const cityInputDOM = document.getElementById("InputCity");
 const stateInputDOM = document.getElementById("InputState");
 const emailInputDOM = document.getElementById("InputEmail");
 const phoneInputDOM = document.getElementById("InputPhone");
+let bioInputDOM = null;
 const updateProfileButton = document.getElementById("update-button");
+let updateBioButton = null;
 
 //Bit Flags for input
 let cityFlag = 1, stateFlag = 2, emailFlag = 4, phoneFlag = 8;
+let bioFlag = 16;
 let inputFlags = 0;
 const inputMask = 15;
+const bioMask = 16;
 
 //Validation
 const flagsToInputDOM = new Map();
@@ -39,6 +46,10 @@ const states = [" ", "AL", "AK", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC",
                 "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
                 "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
                 "TN", "TX", "UT", "VT", "VA", "VI", "WA", "WV", "WI", "WY"];
+const symbols = "@.";
+const specialChars = new Set(['!', '`', '~', '#', '$', '%', '^', '&', '*', '(', 
+                            ')', '+', '=', ':', ';', '"', "'", '<', ',', '>', 
+                            '?', '/', '|']);
 
 //DOM Objects - Visability + Close
 const publicProfileButton = document.getElementById("button-public");
@@ -62,6 +73,9 @@ function turnOnFlag(flag){
 }
 function isAllFlagsOn() {
     return (inputFlags & inputMask) === inputMask;
+}
+function isBioFlagOn() {
+    return (inputFlags & bioMask) === bioMask;
 }
 function validateName(nameValue, nameFlag) {
     if(!nameValue) return turnOffFlag(nameFlag);
@@ -94,6 +108,20 @@ function setupStateDropdown() {
         `;
     }
     stateInputDOM.innerHTML = finalInnerHTML;
+}
+function getProfileTabInnerHTML(userId) {
+    if(userId == "me") return `
+        <div class="form-floating">
+            <textarea class="form-control" style="height: 10rem" placeholder="Leave a description here" id="floatingTextarea"></textarea>
+            <label for="floatingTextarea">Description</label>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class="col-3">
+                <button type="submit" id="button-update-bio" class="btn btn-primary">Update Bio</button>
+            </div>
+        </div>
+    `;
+    else return `<p id="bio-text"><p>`;
 }
 
 //API Calls
@@ -167,18 +195,40 @@ deleteUserButtonDOM.addEventListener('click', deleteUser);
 
 //Events - Settings Tab
 cityInputDOM.addEventListener('input', () => {
-    cityInputDOM.value ? turnOnFlag(cityFlag) : turnOffFlag(cityFlag);
+    validateName(cityInputDOM.value, cityFlag);
 });
 stateInputDOM.addEventListener('input', () => {
     validateName(stateInputDOM.value, stateFlag);
 });
 
 function validateEmailInput() {
-    //BUG - To do validation but as long as non-empty
-    // it wont break any code
     const emailValue = emailInputDOM.value;
-    if(emailValue) return turnOnFlag(emailFlag);
-    else return turnOffFlag(emailFlag);
+    if(!emailValue) return turnOffFlag(emailFlag);
+    let symbolIndex = 0, i = 0;
+    
+    let funcScanToSymbol = () => {
+        for(i; i < emailValue.length; ++i) {
+            //NO special characters
+            if(specialChars.has(emailValue)) break;
+            if(emailValue[i] === symbols[symbolIndex]) {
+                ++symbolIndex;
+                ++i;
+                break;
+            }
+        }
+    };
+    //Scan until we find @ symbol
+    funcScanToSymbol();
+    //Exit if we dont find @ or current char is .
+    if(symbolIndex === 0 || emailValue[i] == symbols[symbolIndex]) 
+        return turnOffFlag(emailFlag);
+    //Scan until we find . symbol
+    funcScanToSymbol();
+    //Exit if we dont find . or reach end of 
+    if(symbolIndex === 1 || i === emailValue.length) 
+        return turnOffFlag(emailFlag);
+
+    turnOnFlag(emailFlag); 
 }
 emailInputDOM.addEventListener('input', validateEmailInput);
 
@@ -199,6 +249,10 @@ function validatePhoneInput() {
 }
 phoneInputDOM.addEventListener('input', validatePhoneInput);
 
+function validateBioInput() {
+    bioInputDOM.value ? turnOnFlag(bioFlag) : turnOffFlag(bioFlag);
+}
+
 async function makePublic(e) {
     e.preventDefault();
     curUser.visible = true;
@@ -214,6 +268,14 @@ async function makePrivate(e) {
     if(result === "") updateVisibilityText(curUser.visible);
 }
 privateProfileButton.addEventListener('click', makePrivate);
+
+async function updateBio(e) {
+    e.preventDefault();
+    if(!isBioFlagOn()) return;
+    curUser.bio = bioInputDOM.value;
+    let result = await updateUser(curUser);
+    if(result === "") initUserProfile();
+}
 
 async function updateProfile(e) {
     e.preventDefault();
@@ -241,7 +303,7 @@ function setProfileText() {
     emailTextDOM.innerText = curUser.email;
     phoneTextDOM.innerText = curUser.phoneNumber;
     cityStateTextDOM.innerText = curUser.city + ", " + curUser.state;
-    //BUG - bio is missing
+    if(bioTextDOM) bioTextDOM.innerText = curUser.bio;
     //BUG - Recent events are missing
 }
 function setPersonalSettings() {
@@ -256,29 +318,49 @@ function setPersonalSettings() {
     validateEmailInput();
     phoneInputDOM.value = curUser.phoneNumber;
     validatePhoneInput();
+    bioInputDOM.value = curUser.bio;
+    validateBioInput();
 }
 async function initUserProfile() {
-    //BUG - possible 404 page instead of redirect home
     let params = new URLSearchParams(window.location.search);
     let userId = params.get('user');
-    if(!userId) window.location.href = `home.html`;
+    if(!userId) window.location.href = `404.html`;
     //Viewing our own profile
+    bioContainerDOM.innerHTML = getProfileTabInnerHTML(userId);
     if(userId === "me") {
         curUser = JSON.parse(localStorage.getItem("login-info"));
-        if(!curUser) window.location.href = `home.html`;
+        if(!curUser) window.location.href = `404.html`;
+        let profileView = localStorage.getItem("profileView");
+        //View events tab
+        if(profileView === '1') {
+            document.getElementById("profile-tab").className= "nav-link";
+            document.getElementById("profile-tab").ariaSelected = false;
+            profileContentDOM.className = "tab-pane fade";
+            document.getElementById("event-tab").className = "nav-link active";
+            document.getElementById("event-tab").ariaSelected = true;
+            eventContentDOM.className = "tab-pane fade show active";
+        }
+        //Setup Bio Update
+        bioInputDOM = document.getElementById("floatingTextarea");
+        bioInputDOM.addEventListener('input', validateBioInput);
+        flagsToInputDOM.set(bioFlag, bioInputDOM);
+        updateBioButton = document.getElementById("button-update-bio");
+        updateBioButton.addEventListener('click', updateBio);
+        //Setup personal Settings
         setProfileText(); 
         setPersonalSettings();
     }
     //Viewing another profile
     else {
         curUser = await getUser(userId);
-        if(!curUser) window.location.href = `home.html`;
+        if(!curUser) window.location.href = `404.html`;
         //Clear settings
         settingsTabDOM.disabled = true;
         settingsTabDOM.className = "nav-link disabled";
         document.getElementById("settings").innerHTML = "";
         //Check for public/private profiles
         if(curUser.visible) {
+            bioTextDOM = document.getElementById("bio-text");
             setProfileText();
             //Clear new event button in events tab
             document.getElementById("new-event-btn-container").innerHTML = ""; 
@@ -287,9 +369,10 @@ async function initUserProfile() {
             //Clear events tab
             eventTabDOM.disabled = true;
             eventTabDOM.className = "nav-link disabled";
-            document.getElementById("event").innerHTML = "";
+            eventContentDOM.innerHTML = "";
+            settingsContentDOM.innerHTML = "";
             //Let viewer know that this profile is private
-            document.getElementById("profile").innerHTML = `
+            profileContentDOM.innerHTML = `
             <h1 class="u-center-text u-color-red mt-5 mb-5">This users profile is private</h1>
             `;
         }
