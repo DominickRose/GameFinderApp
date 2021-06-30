@@ -11,7 +11,9 @@ const eventContainer = document.getElementById("players-reg-container");
 let currentEvent;
 
 function convertNumberToDate() {
-    
+    let minutes = currentEvent.eventDate % 60;
+    currentEvent.eventDate /= 60;
+
 }
 function setEventview(){
     eventName.innerHTML = currentEvent.eventTitle;
