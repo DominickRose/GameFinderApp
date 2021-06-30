@@ -220,11 +220,40 @@ eventCancelButtonDOM.addEventListener('click', (e) => {
 });
 
 //API Calls
-async function submitNewEvent() {
-    //TODO: Please implement this function and fix any bugs you can
-    //Note that the when should be stored as a number in the back end
-    //(numInputTime)
+async function submitNewEvent(e) {
     e.preventDefault();
+    user = localStorage.getItem("login-info");
+    if(!user) return;
+    if(!isAllFlagsOn) return;
+    const event = {
+        "ownerId":user.playerId,
+	    "eventDate":numInputTime,
+	    "city":cityInputDOM.value,
+	    "state":stateInputDOM.value,
+	    "description":descInputDOM.value,
+	    "skillLevel":skillInputDOM.value,
+	    "eventTitle":nameInputDOM.value,
+	    "eventType":typeInputDOM.value,
+	    "maxPlayers":numPlayersInputDOM.value
+    }
+
+    const config = {
+        method:"POST",
+        headers:{'Content-Type':"application/json"},
+        body: JSON.stringify(event)
+    }
+
+    const response = await fetch("http://localhost:7000/events", config)
+
+        if(response.ok){
+            let params = new URLSearchParams();
+            params.set('user', "me");
+            window.location.href = `userProfile.html?${params.toString()}`;
+        }else{
+            let text = await response.text();
+            console.log(response.status, text);
+        }
+
 }
 newEventButtonDOM.addEventListener('click', submitNewEvent);
 
