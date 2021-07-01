@@ -159,12 +159,12 @@ function createNavBar() {
         <div class="container-fluid">
             <a class="navbar-brand" href="home.html">
                 <p class="h4">Ismadoro
-                <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24"
-                    class="d-inline-block align-text-bottom">
-                </img>
                 </p>
                 <p class="h6">Find Volleyball matches near you!</p>
             </a>
+            <img src="https://mrussell2105python.s3.amazonaws.com/Ismadoro.png" alt="" width="100" height="100"
+                                class="d-inline-block align-text-bottom">
+                            </img>
             <form class="nav-search-size">
                 <input id="navbar-search-query" class="form-control nav-search-bar-pos" type="search" 
                 placeholder="Search" aria-label="Search">
@@ -191,6 +191,7 @@ function createNavBar() {
             </div>
         </div>
     </nav>
+    <br>
     `;
     dropdownContainerDOM = document.getElementById("dropdown-container");
     navbarSearchQueryDOM = document.getElementById("navbar-search-query");
