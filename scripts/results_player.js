@@ -23,7 +23,7 @@ const sortState = (a, b) => {
     return 0;
 };
 const sortCity = (a, b) => {
-    if(a.city< b.city) { return -1; }
+    if(a.city < b.city) { return -1; }
     if(a.city > b.city) { return 1; }
     return 0;
 };
@@ -100,8 +100,8 @@ tableCityDOM.addEventListener('click', (e) => {
 
 //API Calls
 //BUG - To remove and all a search route
-async function getAllUsers() {
-    const response = await fetch(`http://127.0.0.1:7000/players`, {
+async function getAllUsers(queryString) {
+    const response = await fetch(`http://127.0.0.1:7000/players?name=${queryString}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
@@ -122,7 +122,7 @@ async function getAllUsers() {
 async function getSearchQuery() {
     let params = new URLSearchParams(window.location.search);
     let queryString = params.get('query');
-    await getAllUsers();
+    if(queryString) await getAllUsers(queryString);
     if(playerResults.length === 0) numResultsDOM.innerText = "No Search results!";
     else numResultsDOM.innerText = "Search Results: " + playerResults.length;
     updateTableRowsInnerHTML();
