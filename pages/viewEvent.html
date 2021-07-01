@@ -23,7 +23,7 @@
         </div>
         <div class="col-8">
             <h2 id="event-name">Super Cool Event with a Very Long Title</h2>
-            <div class="row g-3 mt-1 justify-content-evenly">
+            <div id="owner-button-container" class="row g-3 mt-1 justify-content-evenly">
                 <div class="col-auto">
                     <h3 id="event-city-state">At Wellsprings Stadium</h3>
                 </div>
@@ -46,8 +46,10 @@
                 <p id="event-info-text">Event Info goes here, sorry its so short!</p>
             </div>
             <div class="col-3">
+                <p class="text-center u-color-green mb-1" id="register-info"></p>
                 <h4 id="event-player-registered" class="mb-3"> Registered 8/20:</h4>
-                <div id="players-reg-container"></div>
+                <div class="mb-3" id="players-reg-container"></div>
+                <button type="submit" class="btn btn-primary" id="register-event-button">Register</button>
             </div>
         </div>
     </div>

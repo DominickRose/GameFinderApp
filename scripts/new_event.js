@@ -44,7 +44,7 @@ const types = [" ", "2-on-2", "3-on-3", "4-on-4", "6-on-6"];
 //Can be AM or PM
 const whenFormat = "MM/DD/YYYY:HH:MM AM";
 const monthToDays =      [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const monthToTotalDays = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+const monthToTotalDays = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 366];
 let numInputTime = 0;
 
 //Dropdown setups
@@ -103,14 +103,87 @@ function validateName(nameValue, nameFlag) {
     }
     turnOnFlag(nameFlag);
 }
+function validateNameWithSpaces(nameValue, nameFlag) {
+    if(!nameValue) return turnOffFlag(nameFlag);
+
+    //Name can only contain letters
+    for(let i = 0; i < nameValue.length; ++i) {
+        char = nameValue[i];
+        if(char === ' ') continue;
+        if(char.toUpperCase() === char.toLowerCase()) 
+            return turnOffFlag(nameFlag);
+    }
+    turnOnFlag(nameFlag);
+}
 function getDigit(char) {
     if(char < '0' || char > '9') return -10000;
     return char * 1;
 }
+function eventNumDateToString(eventDate) {
+    let base = "00/00/0000:00:00 AM";
+    //Extract Hours + Minutes
+    let minutes = eventDate % 60;
+    eventDate -= minutes;
+    eventDate /= 60;
+    console.log(eventDate);
+    let hours = eventDate % 24;
+    eventDate -= hours;
+    eventDate /= 24;
+    let pm = 'A';
+    if(hours > 12) {
+        hours -= 12;
+        pm = 'P'
+    }
+    //Get minutes to string form
+    let startPos = minutes >= 10 ? 14 : 15;
+    base = base.substr(0, startPos) + `${minutes} ${pm}` + base.substr(18);
+    //Get hours to string form
+    startPos = hours >= 10 ? 11 : 12;
+    base = base.substr(0, startPos) + `${hours}` + base.substr(13);
+    
+    //Extract Year
+    let year = Math.trunc(eventDate / 365); 
+    eventDate -= year * 365;
+    if(year >= 1000) startPos = 6;
+    else if(year >= 100) startPos = 7; 
+    else if(year >= 10) startPos = 8;
+    else startPos = 9;
+    base = base.substr(0, startPos) + `${year}` + base.substr(10);
+
+    //Extract Months + Days
+    let month;
+    for(month = 0; month < monthToTotalDays.length; ++month) {
+        if(eventDate < monthToTotalDays[month]) break;
+    }
+    let days = (eventDate - monthToTotalDays[--month])+1;
+    startPos = days >= 10 ? 3 : 4;
+    base = base.substr(0, startPos) + `${days}` + base.substr(5);
+    startPos = month >= 10 ? 0 : 1;
+    base = base.substr(0, startPos) + `${month}` + base.substr(2);
+    return base;
+}
+function setInputFields(event) {
+    nameInputDOM.value = event.eventTitle;
+    validateNameWithSpaces(nameInputDOM.value, nameFlag);
+    numPlayersInputDOM.value = event.maxPlayers;
+    validateNumPlayersInput();
+    cityInputDOM.value = event.city;
+    validateName(cityInputDOM.value, cityFlag);
+    stateInputDOM.value = event.state;
+    validateName(stateInputDOM.value, stateFlag);
+    typeInputDOM.value = event.eventType;
+    validateTypeInput();
+    whenInputDOM.value = eventNumDateToString(event.eventDate);
+    validateWhenInput();
+    skillInputDOM.value = event.skillLevel;
+    validateName(skillInputDOM.value, skillFlag);
+    descInputDOM.value = event.description;
+    validateDescInput();
+}
 
 //Events
 function validateNameInput() {
-    validateName(nameInputDOM.value, nameFlag);
+    validateNameWithSpaces(nameInputDOM.value, nameFlag);
 }
 nameInputDOM.addEventListener('input', validateNameInput);
 
@@ -247,10 +320,9 @@ eventCancelButtonDOM.addEventListener('click', (e) => {
 });
 
 //API Calls
-async function submitNewEvent(e) {
+async function submitEvent(e, method, id) {
     e.preventDefault();
-    user = localStorage.getItem("login-info");
-    if(!user) return;
+    user = JSON.parse(localStorage.getItem("login-info"));
     if(!isAllFlagsOn()) {
         newEventErrorDOM.innerText = "Make sure all fields are filled properly!"
         return;
@@ -268,28 +340,59 @@ async function submitNewEvent(e) {
     }
 
     const config = {
-        method:"POST",
+        method: method,
         headers:{'Content-Type':"application/json"},
         body: JSON.stringify(event)
     }
 
     //BUG - Users cannot post events whose dates are in the past
-    const response = await fetch("http://localhost:7000/events", config)
 
-        if(response.ok){
-            let newEvent = await response.json();
-            let params = new URLSearchParams();
-            params.set('eventId', newEvent.eventId);
-            window.location.href = `viewEvent.html?${params.toString()}`;
-        }else{
-            let text = await response.text();
-            console.log(response.status, text);
-        }
+    const response = await fetch("http://localhost:7000/events"+id, config);
+    if(response.ok){
+        let newEvent = await response.json();
+        let params = new URLSearchParams();
+        params.set('eventId', newEvent.eventId);
+        window.location.href = `viewEvent.html?${params.toString()}`;
+    }else{
+        let text = await response.text();
+        console.log(response.status, text);
+    }
 
 }
-newEventButtonDOM.addEventListener('click', submitNewEvent);
+async function getEvent(eventId) {
+    const response = await fetch(`http://localhost:7000/events/${eventId}`);
+    if(response.ok){
+        currentEvent = await response.json()
+        return currentEvent;
+    }else{
+        window.location.href = `404.html`;
+        return null;
+    }
+}
+
+async function initializeForm() {
+    let params = new URLSearchParams(window.location.search);
+    let eventId = params.get('eventId');
+    if(!eventId) {
+        newEventButtonDOM.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await submitEvent(e, "POST", "");
+        });
+        return;
+    }
+    const curEvent = await getEvent(eventId);
+    if(curEvent) {
+        newEventButtonDOM.innerText = "Update";
+        newEventButtonDOM.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await submitEvent(e, "PUT", `/${eventId}`);
+        });
+        setInputFields(curEvent);
+    }
+}
 
 //Process
 setupStateDropdown();
 setupSkillDropdown();
 setupTypeDropdown();
+initializeForm();

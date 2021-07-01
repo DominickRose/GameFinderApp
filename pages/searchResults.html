@@ -9,6 +9,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!--Bootstrap Icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <!--Custom CSS-->
     <link href="../css/style.comp.css" rel="stylesheet">
 
@@ -20,62 +22,66 @@
     <div class="row justify-content-evenly mt-5">
         <div class="col-3 u-center-text">
             <h3>Refine Search</h3>
-            <form>
-                <div>
-                    <label for="InputWhen" class="col-form-label">Events Before:</label>
-                    <input type="text" class="form-control" id="InputWhen">
-                </div>
-                <div>
-                    <label for="InputState" class="col-form-label">State</label>
-                    <input type="text" class="form-control" id="InputState">
-                </div>
-                <div>
-                    <label for="InputType" class="col-form-label">Type</label>
-                    <input type="text" class="form-control" id="InputType">
-                </div>
-                <div>
-                    <label for="InputSkill" class="col-form-label">Skill</label>
-                    <input type="text" class="form-control" id="InputSkill">
+            <form class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="row g-3 mb-5 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputName" class="col-form-label">Name: </label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" id="InputName">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-5 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputWhen" class="col-form-label">Before:</label>
+                            </div>
+                            <div class="col-auto">
+                                <p class="text-center u-color-red mb-1" id="when-error"></p>
+                                <input type="text" placeholder="MM/DD/YYYY:HH:MM AM" class="form-control" id="InputWhen">
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-5 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputState" class="col-form-label">State:</label>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select" id="InputState"></select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="InputType" class="col-form-label">Type:</label>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select" id="InputType"></select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-5 align-items-center">
+                            <div class="col-auto">
+                                <label for="InputSkill" class="col-form-label">Skill:</label>
+                            </div>
+                            <div class="col-5">
+                                <select class="form-select" id="InputSkill"></select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
             <button type="submit" class="btn btn-primary mt-3" id="filter-results-button">Filter Results</button>
         </div>
         <div class="col-7">
-            <h2 id="num-search-reults" class="u-center-text">Search Results: 24</h2>
+            <h2 id="num-search-results" class="u-center-text">No Search results</h2>
             <table class="table table-dark table-striped">
                 <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Location</th>
-                    <th scope="col">Skill</th>
-                    <th scope="col">Date</th>
+                    <th scope="col">#</th>
+                    <th id="table-name" scope="col">Name</th>
+                    <th id="table-state" scope="col">State</th>
+                    <th id="table-city" scope="col">City</th>
+                    <th id="table-date" scope="col">Date</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>John</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>New York</td>
-                    <td>Chicago</td>
-                    <td>Florida</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Beginner</td>
-                    <td>Intermediate</td>
-                    <td>Master</td>
-                </tr>
-                <tr>
-                    <th scope="row">4</th>
-                    <td>3-25-2020</td>
-                    <td>12-10-2020</td>
-                    <td>10-6-2020</td>
-                </tr>
+                <tbody id="table-container">
                 </tbody>
             </table>
         </div>
@@ -86,4 +92,5 @@
         crossorigin="anonymous"></script>
     <!-- Navbar Setup -->
     <script src="../scripts/navbar.js"></script>
+    <script src="../scripts/results_search.js"></script>
 </body>
