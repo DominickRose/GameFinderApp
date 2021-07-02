@@ -6,7 +6,7 @@ const eventType = document.getElementById("event-type-text");
 const eventSkill = document.getElementById("event-skill-text");
 const eventDesc = document.getElementById("event-info-text");
 const eventPlayers = document.getElementById("events-players-registered");
-const eventContainer = document.getElementById("players-reg-container");
+const playersContainer = document.getElementById("players-reg-container");
 const registerButton = document.getElementById("register-event-button");
 const registerInfo = document.getElementById("register-info");
 
@@ -17,6 +17,8 @@ let updateButtonDOM;
 
 let currentEvent;
 let curUser;
+let playersIn = [];
+let isUserRegister = null;
 
 //When Display
 let minutes = "00", hours = 0, pm = "";
@@ -43,23 +45,41 @@ function getOwnerButtonInnerHTML(isOwner) {
         </div>
     `;
 }
-
+function getRegisteredPlayersInnerHTML() {
+    finalInnerHTML = "";
+    let maxRows = Math.min(5, playersIn.length);
+    for(let i = 0; i < maxRows; ++i) {
+        finalInnerHTML += `
+        <div id="player-reg-row-${i+1}">
+            <p>${playersIn[i].firstName + " " + playersIn[i].lastName + ", " 
+            + playersIn[i].state}</p>
+        </div>
+        `;
+    }
+    return finalInnerHTML;
+}
 function extractDateInfo(eventDate) {
     //Extract Hours + Minutes
     let numMinutes = eventDate % 60;
     minutes = numMinutes >= 10 ? minutes.substr(0, 0) : minutes.substr(0, 1);
     minutes += numMinutes;
+
     eventDate -= minutes;
     eventDate /= 60;
     hours = eventDate % 24;
     eventDate -= hours;
     eventDate /= 24;
-    let pm = 'A';
-    if(hours > 12) {
-        hours -= 12;
-        pm = 'P'
+    //Determine AM/PM
+    pm = 'A';
+    if(hours > 11) pm = 'P';
+    //Fix hours number
+    if(pm === 'A') {
+        if(hours === 0) hours = 12;
     }
-    pm += "M";
+    else if(pm === 'P') {
+        if(hours !== 12) hours -= 12;
+    }
+    pm += 'M';
     
     //Extract Year
     year = Math.trunc(eventDate / 365); 
@@ -81,6 +101,14 @@ function setEventview(){
     eventType.innerHTML = currentEvent.eventType;
     eventSkill.innerHTML = currentEvent.skillLevel;
     eventDesc.innerHTML = currentEvent.description;
+}
+function updateButtonView() {
+    if(isUserRegister) registerButton.innerText = "Withdraw";
+    else registerButton.innerText = "Register";
+}
+async function updatePlayersView() {
+    await getRegistrationInfo();
+    playersContainer.innerHTML = getRegisteredPlayersInnerHTML();
 }
 
 //API Calls
@@ -136,11 +164,79 @@ async function registerForEvent() {
     });
     if (response.ok) {
         registerInfo.innerText = "Successfully registered!";
+        isUserRegister = true;
+        updateButtonView(); 
     }
     else {
         let text = await response.text();
         console.log(response.status, text);
         registerInfo.innerText = text;
+        isUserRegister = null;
+    }
+}
+async function withdrawFromEvent() {
+    const response = await fetch(
+        `http://127.0.0.1:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        registerInfo.innerText = "Successfully Withdrew!";
+        isUserRegister = false;
+        updateButtonView(); 
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        registerInfo.innerText = text;
+        isUserRegister = null;
+    }
+}
+async function isRegister() {
+    const response = await fetch(
+        `http://127.0.0.1:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        const result = await response.json();
+        console.log(result[13]);
+        console.log(result[13] === 't');
+        console.log(result[13] === 'f');
+        if (result[13] === 't') return true;
+        else if(result[13] === 'f') return false;
+        else registerButton.disabled = true;
+    }
+    else registerButton.disabled = true;
+    return true;
+}
+async function getRegistrationInfo() {
+    const response = await fetch(`http://127.0.0.1:7000/players?eventId=${currentEvent.eventId}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        playersIn = await response.json();
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        playersIn = [];
     }
 }
 
@@ -170,11 +266,27 @@ async function initEventView() {
     
     if(!curUser) registerButton.disabled = true;
     else {
-        //BUG - remove registration option if already registered
-        registerButton.addEventListener('click', registerForEvent);
+        isUserRegister = await isRegister();
+        updateButtonView(); 
+        registerButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if(isUserRegister === null) {
+                return;
+            }
+            if(isUserRegister) {
+                await withdrawFromEvent();
+                updatePlayersView();
+            }
+            else {
+                await registerForEvent();
+                if(playersIn.length < 5) updatePlayersView();
+            }
+            
+        });
     }
     cityState = document.getElementById("event-city-state");
     setEventview();
+    updatePlayersView();
 }
 
 //Process

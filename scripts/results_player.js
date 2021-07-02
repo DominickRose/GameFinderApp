@@ -33,7 +33,6 @@ let activeToSortDesc = [(a,b) => { return sortName(a,b) * -1;},
                         (a,b) => { return sortCity(a,b) * -1;}];
 
 //Helper Functions
-//BUG - Scrolling for large datasets
 function updateTableRowsInnerHTML() {
     finalInnerHTML = "";
     for(let i = 0; i < playerResults.length; ++i) {
@@ -99,7 +98,6 @@ tableCityDOM.addEventListener('click', (e) => {
 });
 
 //API Calls
-//BUG - To remove and all a search route
 async function getAllUsers(queryString) {
     const response = await fetch(`http://127.0.0.1:7000/players?name=${queryString}`, {
         method: 'GET',

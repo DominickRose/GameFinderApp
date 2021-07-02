@@ -40,6 +40,7 @@ const types = ["", "2-on-2", "3-on-3", "4-on-4", "6-on-6"];
 const whenFormat = "MM/DD/YYYY:HH:MM AM";
 const monthToDays =      [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const monthToTotalDays = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+let numInputTime = 0;
 
 //Table
 //Events are sorted alpha order by default
@@ -128,8 +129,9 @@ function validateName(nameValue, nameFlag) {
     }
     turnOnFlag(nameFlag);
 }
-//BUG - Scrolling for large datasets
 function updateTableRowsInnerHTML() {
+    if(eventResults.length === 0) numResultsDOM.innerText = "No Search results!";
+    else numResultsDOM.innerText = "Search Results: " + eventResults.length;
     finalInnerHTML = "";
     for(let i = 0; i < eventResults.length; ++i) {
         finalInnerHTML += `
@@ -184,6 +186,7 @@ nameInputDOM.addEventListener('input', () => {
 });
 function validateWhenInput() {
     const whenValue = whenInputDOM.value;
+    numInputTime = 0;
     if(!whenValue) {
         eventWhenErrorDOM.innerText = "";
         return turnOnFlag(whenFlag);
@@ -272,7 +275,6 @@ function validateWhenInput() {
     numInputTime += day * 24 * 60;
     numInputTime += hour * 60;
     numInputTime += minute;
-    console.log(numInputTime);
 }
 whenInputDOM.addEventListener('input', validateWhenInput);
 
@@ -298,19 +300,22 @@ tableDateDOM.addEventListener('click', (e) => {
     toggleFlag();
 })
 
-//BUG - To remove and all a search route
-async function findEventsBy() {
-    const response = await fetch(`http://127.0.0.1:7000/events`, {
-        method: 'GET',
+async function findEventsBy(searchObject) {
+    const response = await fetch(`http://127.0.0.1:7000/events/search`, {
+        method: 'POST',
         mode: 'cors',
         credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json'
         },
-        referrerPolicy: 'no-referrer'
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify(searchObject)
     });
     if (response.ok) {
-        eventResults = await response.json();
+        const result = await response.json();
+        console.log(result);
+        if(result) eventResults = result;
+        else eventResults = []; 
     }
     else {
         let text = await response.text();
@@ -318,12 +323,24 @@ async function findEventsBy() {
         eventResults = [];
     }
 }
+filterButton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await findEventsBy({'eventTitle': nameInputDOM.value,
+                        'eventState': stateInputDOM.value,
+                        'eventTime': numInputTime,
+                        'eventType': typeInputDOM.value,
+                        'eventSkill': stateInputDOM.value});
+    updateTableRowsInnerHTML();
+});
+
 async function getSearchQuery() {
     let params = new URLSearchParams(window.location.search);
     let queryString = params.get('query');
-    await findEventsBy();
-    if(eventResults.length === 0) numResultsDOM.innerText = "No Search results!";
-    else numResultsDOM.innerText = "Search Results: " + eventResults.length;
+    if(queryString) await findEventsBy({'eventTitle': queryString,
+                                        'eventState': "",
+                                        'eventTime': 0,
+                                        'eventType': "",
+                                        'eventSkill': ""});
     updateTableRowsInnerHTML();
 }
 

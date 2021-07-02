@@ -55,6 +55,13 @@
   width: 300%;
 }
 
+.u-table-height-7 {
+  height: 70%;
+}
+.u-table-height-4 {
+  height: 50%;
+}
+
 .nav-search-size {
   display: inline-block;
   position: relative;

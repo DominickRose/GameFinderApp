@@ -13,6 +13,19 @@ const cityStateTextDOM = document.getElementById("city-state-text");
 const nameTextDOM = document.getElementById("name-text");
 let bioTextDOM = null;
 
+//DOM Object - Registration Info Table
+const regTableNameDOM = document.getElementById("table-reg-for-name");
+const regTableStateDOM = document.getElementById("table-reg-for-state");
+const regTableCityDOM = document.getElementById("table-reg-for-city");
+const regTableDateDOM = document.getElementById("table-reg-for-date");
+const regTableContainer = document.getElementById("table-reg-for-container");
+//DOM Object - Created Info Table
+const createTableNameDOM = document.getElementById("table-create-name");
+const createTableStateDOM = document.getElementById("table-create-state");
+const createTableCityDOM = document.getElementById("table-create-city");
+const createTableDateDOM = document.getElementById("table-create-date");
+const createTableContainer = document.getElementById("table-create-container");
+
 //Profile User
 let curUser = null;
 
@@ -31,6 +44,12 @@ let bioFlag = 16;
 let inputFlags = 0;
 const inputMask = 15;
 const bioMask = 16;
+//Bit Flags for reg info table
+let activeRegBit = 0;
+let sortRegFlags = 0;
+//Bit Flags for created info table
+let activeCreateBit = 0;
+let sortCreateFlags = 0;
 
 //Validation
 const flagsToInputDOM = new Map();
@@ -50,6 +69,38 @@ const symbols = "@.";
 const specialChars = new Set(['!', '`', '~', '#', '$', '%', '^', '&', '*', '(', 
                             ')', '+', '=', ':', ';', '"', "'", '<', ',', '>', 
                             '?', '/', '|']);
+
+//Table
+let registeredFor = [];
+let activeRegBitToDom = [regTableNameDOM, regTableStateDOM, regTableCityDOM, regTableDateDOM];
+let createdEvents = [];
+let activeCreateBitToDom = [createTableNameDOM, createTableStateDOM, createTableCityDOM, createTableDateDOM];
+
+const sortName = (a, b) => {
+    if(a.eventTitle < b.eventTitle) { return -1; }
+    if(a.eventTitle > b.eventTitle) { return 1; }
+    return 0;
+};
+const sortState = (a, b) => {
+    if(a.state < b.state) { return -1; }
+    if(a.state > b.state) { return 1; }
+    return 0;
+};
+const sortCity = (a, b) => {
+    if(a.city < b.city) { return -1; }
+    if(a.city > b.city) { return 1; }
+    return 0;
+};
+const sortDate = (a, b) => {
+    if(a.eventDate < b.eventDate) { return -1; }
+    if(a.eventDate > b.eventDate) { return 1; }
+    return 0;
+};
+let activeToSortAsc = [sortName, sortState, sortCity, sortDate];
+let activeToSortDesc = [(a,b) => { return sortName(a,b) * -1;}, 
+                        (a,b) => { return sortState(a,b) * -1;},
+                        (a,b) => { return sortCity(a,b) * -1;},
+                        (a,b) => { return sortDate(a,b) * -1}];
 
 //DOM Objects - Visability + Close
 const publicProfileButton = document.getElementById("button-public");
@@ -124,6 +175,55 @@ function getProfileTabInnerHTML(userId) {
     else return `<p id="bio-text"><p>`;
 }
 
+//Helper Functions - Table
+function updateTableRowsInnerHTML(tableContainerDOM, eventList, idName) {
+    finalInnerHTML = "";
+    for(let i = 0; i < eventList.length; ++i) {
+        finalInnerHTML += `
+        <tr id="${idName}-row-${i+1}">
+            <th scope="row">${i+1}</th>
+            <td>${eventList[i].eventTitle}</td>
+            <td>${eventList[i].state}</td>
+            <td>${eventList[i].city}</td>
+            <td>${eventList[i].eventDate}</td>
+        </tr>
+        `;
+    }
+    tableContainerDOM.innerHTML = finalInnerHTML;
+    //Set click events for each table row
+    for(let i = 0; i < eventList.length; ++i) {
+        document.getElementById(`${idName}-row-${i+1}`).addEventListener('click', (e) => {
+            e.preventDefault();
+            let params = new URLSearchParams();
+            params.set('eventId', eventList[i].eventId);
+            window.location.href = `viewEvent.html?${params.toString()}`;
+        });
+    }
+}
+function updateArrows(activeBitToDOM, sortFlags, activeBit) {
+    activeBitToDOM[0].innerHTML = "Name";
+    activeBitToDOM[1].innerHTML = "State";
+    activeBitToDOM[2].innerHTML = "City";
+    activeBitToDOM[3].innerHTML = "Date";
+    if((sortFlags & (1 << activeBit))) 
+        activeBitToDOM[activeBit].innerHTML += 
+        `<i class="bi bi-arrow-down-short"></i>`;
+    else
+        activeBitToDOM[activeBit].innerHTML += 
+        `<i class="bi bi-arrow-up-short"></i>`;
+}
+function sortResults(eventList, sortFlags, activeBit) {
+    let sortFunc;
+    if((sortFlags & (1 << activeBit))) sortFunc = activeToSortAsc[activeBit];
+    else sortFunc = activeToSortDesc[activeBit]; 
+    eventList.sort(sortFunc);
+}
+function toggleFlag(tableContainerDOM, eventList, activeBitToDOM, 
+                    sortFlags, activeBit, idName) {
+    updateArrows(activeBitToDOM, sortFlags, activeBit);
+    sortResults(eventList, sortFlags, activeBit);
+    updateTableRowsInnerHTML(tableContainerDOM, eventList, idName);
+}
 //API Calls
 async function getUser(userID) {
     const response = await fetch(`http://127.0.0.1:7000/players/${userID}`, {
@@ -191,6 +291,44 @@ async function deleteUser(e) {
     }
 }
 deleteUserButtonDOM.addEventListener('click', deleteUser);
+async function getRegistrationInfo(userId) {
+    const response = await fetch(`http://127.0.0.1:7000/events?playerId=${userId}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        registeredFor = await response.json();
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        registeredFor = [];
+    }
+}
+async function getCreatedInfo(userId) {
+    const response = await fetch(`http://127.0.0.1:7000/events/user/${userId}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        referrerPolicy: 'no-referrer'
+    });
+    if (response.ok) {
+        createdEvents = await response.json();
+    }
+    else {
+        let text = await response.text();
+        console.log(response.status, text);
+        createdEvents = [];
+    }
+}
 
 
 //Events - Settings Tab
@@ -296,6 +434,65 @@ newEventButtonDOM.addEventListener('click', (e) => {
     window.location.href = `createEvent.html`;
 });
 
+//Events - Table Register Info
+regTableNameDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeRegBit = 0;
+    sortRegFlags = (sortRegFlags ^ (1 << activeRegBit));
+    toggleFlag(regTableContainer, registeredFor, activeRegBitToDom,
+                sortRegFlags, activeRegBit, "reg-for-table");
+});
+regTableStateDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeRegBit = 1;
+    sortRegFlags = (sortRegFlags ^ (1 << activeRegBit));
+    toggleFlag(regTableContainer, registeredFor, activeRegBitToDom,
+        sortRegFlags, activeRegBit, "reg-for-table");
+});
+regTableCityDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeRegBit = 2;
+    sortRegFlags = (sortRegFlags ^ (1 << activeRegBit));
+    toggleFlag(regTableContainer, registeredFor, activeRegBitToDom,
+        sortRegFlags, activeRegBit, "reg-for-table");
+});
+regTableDateDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeRegBit = 3;
+    sortRegFlags = (sortRegFlags ^ (1 << activeRegBit));
+    toggleFlag(regTableContainer, registeredFor, activeRegBitToDom,
+        sortRegFlags, activeRegBit, "reg-for-table");
+})
+//Events - Table Created Info
+createTableNameDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeCreateBit = 0;
+    sortCreateFlags = (sortCreateFlags ^ (1 << activeCreateBit));
+    toggleFlag(createTableContainer, createdEvents, activeCreateBitToDom,
+        sortCreateFlags, activeCreateBit, "create-table");
+});
+createTableStateDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeCreateBit = 1;
+    sortCreateFlags = (sortCreateFlags ^ (1 << activeCreateBit));
+    toggleFlag(createTableContainer, createdEvents, activeCreateBitToDom,
+        sortCreateFlags, activeCreateBit, "create-table");
+});
+createTableCityDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeCreateBit = 2;
+    sortCreateFlags = (sortCreateFlags ^ (1 << activeCreateBit));
+    toggleFlag(createTableContainer, createdEvents, activeCreateBitToDom,
+        sortCreateFlags, activeCreateBit, "create-table");
+});
+createTableDateDOM.addEventListener('click', (e) => {
+    e.preventDefault();
+    activeCreateBit = 3;
+    sortCreateFlags = (sortCreateFlags ^ (1 << activeCreateBit));
+    toggleFlag(createTableContainer, createdEvents, activeCreateBitToDom,
+        sortCreateFlags, activeCreateBit, "create-table");
+})
+
 //Init Functions
 function setProfileText() {
     //Profile Text
@@ -320,6 +517,14 @@ function setPersonalSettings() {
     validatePhoneInput();
     bioInputDOM.value = curUser.bio;
     validateBioInput();
+}
+async function setEventsRegisteredFor(userId) {
+    await getRegistrationInfo(userId); 
+    updateTableRowsInnerHTML(regTableContainer, registeredFor, "reg-for-table");
+}
+async function setEventsCreated(userId){
+    await getCreatedInfo(userId);
+    updateTableRowsInnerHTML(createTableContainer, createdEvents, "create-table");
 }
 async function initUserProfile() {
     let params = new URLSearchParams(window.location.search);
@@ -349,6 +554,8 @@ async function initUserProfile() {
         //Setup personal Settings
         setProfileText(); 
         setPersonalSettings();
+        await setEventsRegisteredFor(curUser.playerId);
+        await setEventsCreated(curUser.playerId);
     }
     //Viewing another profile
     else {
@@ -362,6 +569,7 @@ async function initUserProfile() {
         if(curUser.visible) {
             bioTextDOM = document.getElementById("bio-text");
             setProfileText();
+            await setEventsRegisteredFor(userId);
             //Clear new event button in events tab
             document.getElementById("new-event-btn-container").innerHTML = ""; 
         }
