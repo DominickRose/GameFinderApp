@@ -63,17 +63,23 @@ function extractDateInfo(eventDate) {
     let numMinutes = eventDate % 60;
     minutes = numMinutes >= 10 ? minutes.substr(0, 0) : minutes.substr(0, 1);
     minutes += numMinutes;
+
     eventDate -= minutes;
     eventDate /= 60;
     hours = eventDate % 24;
     eventDate -= hours;
     eventDate /= 24;
-    let pm = 'A';
-    if(hours > 12) {
-        hours -= 12;
-        pm = 'P'
+    //Determine AM/PM
+    pm = 'A';
+    if(hours > 11) pm = 'P';
+    //Fix hours number
+    if(pm === 'A') {
+        if(hours === 0) hours = 12;
     }
-    pm += "M";
+    else if(pm === 'P') {
+        if(hours !== 12) hours -= 12;
+    }
+    pm += 'M';
     
     //Extract Year
     year = Math.trunc(eventDate / 365); 

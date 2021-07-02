@@ -125,14 +125,18 @@ function eventNumDateToString(eventDate) {
     let minutes = eventDate % 60;
     eventDate -= minutes;
     eventDate /= 60;
-    console.log(eventDate);
     let hours = eventDate % 24;
     eventDate -= hours;
     eventDate /= 24;
+    //Determine AM/PM
     let pm = 'A';
-    if(hours > 12) {
-        hours -= 12;
-        pm = 'P'
+    if(hours > 11) pm = 'P';
+    //Fix hours number
+    if(pm === 'A') {
+        if(hours === 0) hours = 12;
+    }
+    else if(pm === 'P') {
+        if(hours !== 12) hours -= 12;
     }
     //Get minutes to string form
     let startPos = minutes >= 10 ? 14 : 15;
@@ -229,7 +233,6 @@ function validateWhenInput() {
         return turnOffFlag(whenFlag);
     }
 
-    console.log(whenValue);
     //Check for slashes
     if(whenValue[2] !== '/' || whenValue[5] !== '/') {
         eventWhenErrorDOM.innerText = "You're missing slashes";
@@ -257,14 +260,20 @@ function validateWhenInput() {
 
     //Hour
     let hour = (getDigit(whenValue[11]) * 10) + getDigit(whenValue[12]);
-    console.log(hour);
     //Hour must be between 1 and 12
     if(hour < 1 || hour > 12) {
         eventWhenErrorDOM.innerText = "Hour must be between 1-12";
         return turnOffFlag(whenFlag);
     }
-    if(hour === 12 && whenValue[17] === 'A') hour = 0;
-    if(whenValue[17] === 'P') hour += 12;
+    //Convert hour to 0-23
+    //AM -> 0-11
+    //PM -> 12-23
+    if(whenValue[17] === 'A') {
+        if(hour === 12) hour = 0;
+    }
+    else if(whenValue[17] === 'P') {
+        if(hour !== 12) hour += 12;
+    }
 
     //Minute
     let minute = (getDigit(whenValue[14]) * 10) + getDigit(whenValue[15]);
@@ -308,7 +317,6 @@ function validateWhenInput() {
     numInputTime += day * 24 * 60;
     numInputTime += hour * 60;
     numInputTime += minute;
-    console.log(numInputTime);
 }
 whenInputDOM.addEventListener('input', validateWhenInput);
 
