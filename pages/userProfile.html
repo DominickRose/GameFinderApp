@@ -9,6 +9,8 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!--Bootstrap Icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <!--Custom CSS-->
     <link href="../css/style.comp.css" rel="stylesheet">
 
@@ -62,84 +64,42 @@
             <div class="row justify-content-evenly">
                 <div class="col-5">
                     <h2 class="mb-3 mt-3 text-center">Events Created</h2>
-                    <table class="table table-dark table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Location</th>
-                            <th scope="col">Skill</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>John</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>New York</td>
-                            <td>Chicago</td>
-                            <td>Florida</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Beginner</td>
-                            <td>Intermediate</td>
-                            <td>Master</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">4</th>
-                            <td>3-25-2020</td>
-                            <td>12-10-2020</td>
-                            <td>10-6-2020</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="u-table-height-7 overflow-auto">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th id="table-create-name" scope="col">Name</th>
+                                <th id="table-create-state" scope="col">State</th>
+                                <th id="table-create-city" scope="col">City</th>
+                                <th id="table-create-date" scope="col">Date</th>
+                            </tr>
+                            </thead>
+                            <tbody id="table-create-container">
+                            </tbody>
+                        </table>
+                    </div>
                     <div id="new-event-btn-container" class="text-center mt-3">
                         <button type="submit" id="button-new-event" class="btn btn-primary">New Event</button>
                     </div>
                 </div>
                 <div class="col-5">
                     <h2 class="mb-3 mt-3 text-center">Events Registered for</h2>
-                    <table class="table table-dark table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Location</th>
-                            <th scope="col">Skill</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>John</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>New York</td>
-                            <td>Chicago</td>
-                            <td>Florida</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Beginner</td>
-                            <td>Intermediate</td>
-                            <td>Master</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">4</th>
-                            <td>3-25-2020</td>
-                            <td>12-10-2020</td>
-                            <td>10-6-2020</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div class="u-table-height-7 overflow-auto">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th id="table-reg-for-name" scope="col">Name</th>
+                                <th id="table-reg-for-state" scope="col">State</th>
+                                <th id="table-reg-for-city" scope="col">City</th>
+                                <th id="table-reg-for-date" scope="col">Date</th>
+                            </tr>
+                            </thead>
+                            <tbody id="table-reg-for-container">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
