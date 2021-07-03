@@ -15,11 +15,21 @@
     <link href="../css/style.comp.css" rel="stylesheet">
 
     <title>Your Profile</title>
+
+    <style>
+        body {
+            background-image:url(https://mrussell2105python.s3.amazonaws.com/Profile.png);
+            background-position:center;
+            width:1920px;
+            height:1080px;
+        }
+    </style>
 </head>
 
-<body>
+<body style="color: white;">
     <div id="navbar-container"></div>
-    <ul class="nav nav-tabs nav-fill mt-3" id="myTab" role="tablist">
+    <ul class="nav nav-tabs nav-fill mt-3" id="myTab" role="tablist" style='color: white;
+        background-color: rgb(32,37,41); border-radius: 12px; padding: 15px'>
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
                 <h2>Profile</h2>
@@ -36,7 +46,8 @@
             </button>
         </li>
       </ul>
-      <div class="tab-content" id="myTabContent">
+      <div class="tab-content" id="myTabContent" style='color: white;
+        background-color: rgb(32,37,41); border-radius: 12px; padding: 15px'>
         <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="row justify-content-evenly mt-3">
                 <div class="col-3"> 
@@ -79,7 +90,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div id="new-event-btn-container" class="text-center mt-3">
+                    <div id="new-event-btn-container" class="text-center mt-3" style='color: white;
+        background-color: rgb(32,37,41); border-radius: 12px; padding: 50px'>
                         <button type="submit" id="button-new-event" class="btn btn-primary">New Event</button>
                     </div>
                 </div>

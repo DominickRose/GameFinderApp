@@ -13,19 +13,29 @@
     <link href="../css/style.comp.css" rel="stylesheet">
 
     <title>Event View</title>
+
+    <style>
+        body {
+            background-image:url(https://mrussell2105python.s3.amazonaws.com/Event.png);
+            background-position:center;
+            width:1920px;
+            height:1080px;
+        }
+    </style>
 </head>
 
-<body>
+<body style="color: white;">
     <div id="navbar-container"></div>
-    <div class="row g-3 mt-3 align-items-center">
+    <div class="row g-3 mt-3 align-items-center" style='color: white;
+        background-color: rgb(32,37,41); border-radius: 12px; padding: 15px'>
         <div class="col-4 u-center-text">
             <img src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24">
         </div>
         <div class="col-8">
-            <h2 id="event-name">Super Cool Event with a Very Long Title</h2>
+            <h2 id="event-name" style="margin-left: 25%; width: 8em;">Super Cool Event with a Very Long Title</h2>
             <div id="owner-button-container" class="row g-3 mt-1 justify-content-evenly">
                 <div class="col-auto">
-                    <h3 id="event-city-state">At Wellsprings Stadium</h3>
+                    <h3 id="event-city-state" style="margin-left: 25%; width: 8em;">At Wellsprings Stadium</h3>
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-primary" id="update-event-button">Update</button>
@@ -38,7 +48,9 @@
         <div class="row justify-content-evenly mt-5">
             <div class="col-3">
                 <h4 id="event-when-text" class="mb-2">November 12th @ 8:30 am</h4>
+                <br>
                 <h4 id="event-type-text" class="mb-2">Type: 2-on-2</h4>
+                <br>
                 <h4 id="event-skill-text" class="mb-2">Skill: Intermediate</h4>
             </div>
             <div class="col-3">
