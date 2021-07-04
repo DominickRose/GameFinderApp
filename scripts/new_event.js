@@ -317,6 +317,7 @@ function validateWhenInput() {
     numInputTime += day * 24 * 60;
     numInputTime += hour * 60;
     numInputTime += minute;
+    console.log(numInputTime);
 }
 whenInputDOM.addEventListener('input', validateWhenInput);
 

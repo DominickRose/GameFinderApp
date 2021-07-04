@@ -179,6 +179,10 @@ function toggleFlag() {
     sortResults();
     updateTableRowsInnerHTML();
 }
+function getDigit(char) {
+    if(char < '0' || char > '9') return -10000;
+    return char * 1;
+}
 
 //Events - Validation
 nameInputDOM.addEventListener('input', () => {
