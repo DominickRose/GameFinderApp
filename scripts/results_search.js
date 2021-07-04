@@ -333,7 +333,7 @@ filterButton.addEventListener('click', async (e) => {
                         'eventState': stateInputDOM.value,
                         'eventTime': numInputTime,
                         'eventType': typeInputDOM.value,
-                        'eventSkill': stateInputDOM.value});
+                        'eventSkill': skillInputDOM.value});
     updateTableRowsInnerHTML();
 });
 
