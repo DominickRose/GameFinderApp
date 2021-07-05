@@ -142,7 +142,7 @@ tableDateDOM.addEventListener('click', (e) => {
 
 //API Calls
 async function findEventsBy(searchObject) {
-    const response = await fetch(`http://127.0.0.1:7000/events/search`, {
+    const response = await fetch(`http://54.219.209.0:7000//events/search`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'same-origin',

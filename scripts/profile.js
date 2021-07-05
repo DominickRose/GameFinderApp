@@ -258,7 +258,7 @@ function toggleFlag(tableContainerDOM, eventList, activeBitToDOM,
 }
 //API Calls
 async function getUser(userID) {
-    const response = await fetch(`http://127.0.0.1:7000/players/${userID}`, {
+    const response = await fetch(`http://54.219.209.0:7000/players/${userID}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
@@ -278,7 +278,7 @@ async function getUser(userID) {
     }
 }
 async function updateUser(json_body) {
-    const response = await fetch(`http://127.0.0.1:7000/players/${json_body.playerId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/players/${json_body.playerId}`, {
         method: 'PUT',
         mode: 'cors',
         credentials: 'same-origin',
@@ -304,7 +304,7 @@ async function deleteUser(e) {
     e.preventDefault();
     if(!localStorage.getItem("login-info")) return;
     const user = JSON.parse(localStorage.getItem("login-info"));
-    const response = await fetch(`http://127.0.0.1:7000/players/${user.playerId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/players/${user.playerId}`, {
         method: 'DELETE',
         mode: 'cors',
         credentials: 'same-origin',
@@ -324,7 +324,7 @@ async function deleteUser(e) {
 }
 deleteUserButtonDOM.addEventListener('click', deleteUser);
 async function getRegistrationInfo(userId) {
-    const response = await fetch(`http://127.0.0.1:7000/events?playerId=${userId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/events?playerId=${userId}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
@@ -343,7 +343,7 @@ async function getRegistrationInfo(userId) {
     }
 }
 async function getCreatedInfo(userId) {
-    const response = await fetch(`http://127.0.0.1:7000/events/user/${userId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/events/user/${userId}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',

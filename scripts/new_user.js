@@ -182,7 +182,7 @@ async function submitNewUser(e) {
         newUserErrorDOM.innerText = "Make sure all fields are filled properly!"
         return;
     }
-    const response = await fetch(`http://127.0.0.1:7000/players`, {
+    const response = await fetch(`http://54.219.209.0:7000/players`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'same-origin',

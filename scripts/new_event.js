@@ -356,7 +356,7 @@ async function submitEvent(e, method, id) {
 
     //BUG - Users cannot post events whose dates are in the past
 
-    const response = await fetch("http://localhost:7000/events"+id, config);
+    const response = await fetch("http://54.219.209.0:7000/events"+id, config);
     if(response.ok){
         let newEvent = await response.json();
         let params = new URLSearchParams();
@@ -369,7 +369,7 @@ async function submitEvent(e, method, id) {
 
 }
 async function getEvent(eventId) {
-    const response = await fetch(`http://localhost:7000/events/${eventId}`);
+    const response = await fetch(`http://54.219.209.0:7000/events/${eventId}`);
     if(response.ok){
         currentEvent = await response.json()
         return currentEvent;
