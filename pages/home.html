@@ -28,44 +28,25 @@
     <div id="navbar-container"></div>
     <h1 class="u-center-text u-margin-bottom-small" style='color: white;
         background-color: rgb(32,37,41); border-radius: 12px; padding: 15px'>Featured Events</h1>
-
-    <table class="table table-dark table-striped">
-      <thead>
-        <tr>
-            <th scope="col">Name<i class="bi bi-arrow-down-short"></i></th>
-            <th scope="col">Location<i class="bi bi-arrow-up-short"></i></th>
-            <th scope="col">Skill</th>
-            <th scope="col">Date</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>John</td>
-        </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>New York</td>
-            <td>Chicago</td>
-            <td>Florida</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>Beginner</td>
-            <td>Intermediate</td>
-            <td>Master</td>
-        </tr>
-        <tr>
-            <th scope="row">4</th>
-            <td>3-25-2020</td>
-            <td>12-10-2020</td>
-            <td>10-6-2020</td>
-        </tr>
-        </tbody>
-    </table>
-
+    <div class="row justify-content-evenly">
+        <div class="col-9">
+            <div class="overflow-auto">
+                <table class="table table-dark table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th id="table-name" scope="col">Name</th>
+                            <th id="table-state" scope="col">State</th>
+                            <th id="table-city" scope="col">City</th>
+                            <th id="table-date" scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-container">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"

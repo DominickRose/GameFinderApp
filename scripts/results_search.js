@@ -129,6 +129,37 @@ function validateName(nameValue, nameFlag) {
     }
     turnOnFlag(nameFlag);
 }
+function eventNumDateToString(eventDate) {
+    let base = "00/00/0000";
+    //Extract Hours + Minutes
+    let minutes = eventDate % 60;
+    eventDate -= minutes;
+    eventDate /= 60;
+    let hours = eventDate % 24;
+    eventDate -= hours;
+    eventDate /= 24;
+    
+    //Extract Year
+    let year = Math.trunc(eventDate / 365); 
+    eventDate -= year * 365;
+    if(year >= 1000) startPos = 6;
+    else if(year >= 100) startPos = 7; 
+    else if(year >= 10) startPos = 8;
+    else startPos = 9;
+    base = base.substr(0, startPos) + `${year}`;
+
+    //Extract Months + Days
+    let month;
+    for(month = 0; month < monthToTotalDays.length; ++month) {
+        if(eventDate < monthToTotalDays[month]) break;
+    }
+    let days = (eventDate - monthToTotalDays[--month])+1;
+    startPos = days >= 10 ? 3 : 4;
+    base = base.substr(0, startPos) + `${days}` + base.substr(5);
+    startPos = month >= 10 ? 0 : 1;
+    base = base.substr(0, startPos) + `${month}` + base.substr(2);
+    return base;
+}
 function updateTableRowsInnerHTML() {
     if(eventResults.length === 0) numResultsDOM.innerText = "No Search results!";
     else numResultsDOM.innerText = "Search Results: " + eventResults.length;
@@ -140,7 +171,7 @@ function updateTableRowsInnerHTML() {
             <td>${eventResults[i].eventTitle}</td>
             <td>${eventResults[i].state}</td>
             <td>${eventResults[i].city}</td>
-            <td>${eventResults[i].eventDate}</td>
+            <td>${eventNumDateToString(eventResults[i].eventDate)}</td>
         </tr>
         `;
     }
