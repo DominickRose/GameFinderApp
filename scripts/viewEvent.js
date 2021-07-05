@@ -115,7 +115,7 @@ async function updatePlayersView() {
 async function getEventsById() {
     let params = new URLSearchParams(window.location.search);
     eventId = params.get('eventId');
-    const response = await fetch(`http://localhost:7000/events/${eventId}`);
+    const response = await fetch(`http://54.219.209.0:7000/events/${eventId}`);
     if(response.ok){
         currentEvent = await response.json()
         eventId = currentEvent.eventId;
@@ -128,7 +128,7 @@ async function deleteEvent() {
     if(!curUser || curUser.playerId !== currentEvent.ownerId)
         return;
 
-    const response = await fetch(`http://127.0.0.1:7000/events/${eventId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/events/${eventId}`, {
         method: 'DELETE',
         mode: 'cors',
         credentials: 'same-origin',
@@ -148,7 +148,7 @@ async function deleteEvent() {
     }
 }
 async function registerForEvent() {
-    const response = await fetch(`http://127.0.0.1:7000/registrations`, {
+    const response = await fetch(`http://54.219.209.0:7000/registrations`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'same-origin',
@@ -176,7 +176,7 @@ async function registerForEvent() {
 }
 async function withdrawFromEvent() {
     const response = await fetch(
-        `http://127.0.0.1:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
+        `http://54.219.209.0:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
         method: 'DELETE',
         mode: 'cors',
         credentials: 'same-origin',
@@ -199,7 +199,7 @@ async function withdrawFromEvent() {
 }
 async function isRegister() {
     const response = await fetch(
-        `http://127.0.0.1:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
+        `http://54.219.209.0:7000/registrations/${curUser.playerId}/${currentEvent.eventId}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
@@ -221,7 +221,7 @@ async function isRegister() {
     return true;
 }
 async function getRegistrationInfo() {
-    const response = await fetch(`http://127.0.0.1:7000/players?eventId=${currentEvent.eventId}`, {
+    const response = await fetch(`http://54.219.209.0:7000/players?eventId=${currentEvent.eventId}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',

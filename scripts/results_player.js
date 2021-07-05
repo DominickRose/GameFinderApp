@@ -99,7 +99,7 @@ tableCityDOM.addEventListener('click', (e) => {
 
 //API Calls
 async function getAllUsers(queryString) {
-    const response = await fetch(`http://127.0.0.1:7000/players?name=${queryString}`, {
+    const response = await fetch(`http://54.219.209.0:7000/players?name=${queryString}`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'same-origin',
