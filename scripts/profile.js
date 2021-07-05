@@ -75,6 +75,7 @@ let registeredFor = [];
 let activeRegBitToDom = [regTableNameDOM, regTableStateDOM, regTableCityDOM, regTableDateDOM];
 let createdEvents = [];
 let activeCreateBitToDom = [createTableNameDOM, createTableStateDOM, createTableCityDOM, createTableDateDOM];
+const monthToTotalDays = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 366];
 
 const sortName = (a, b) => {
     if(a.eventTitle < b.eventTitle) { return -1; }
@@ -176,6 +177,37 @@ function getProfileTabInnerHTML(userId) {
 }
 
 //Helper Functions - Table
+function eventNumDateToString(eventDate) {
+    let base = "00/00/0000";
+    //Extract Hours + Minutes
+    let minutes = eventDate % 60;
+    eventDate -= minutes;
+    eventDate /= 60;
+    let hours = eventDate % 24;
+    eventDate -= hours;
+    eventDate /= 24;
+    
+    //Extract Year
+    let year = Math.trunc(eventDate / 365); 
+    eventDate -= year * 365;
+    if(year >= 1000) startPos = 6;
+    else if(year >= 100) startPos = 7; 
+    else if(year >= 10) startPos = 8;
+    else startPos = 9;
+    base = base.substr(0, startPos) + `${year}`;
+
+    //Extract Months + Days
+    let month;
+    for(month = 0; month < monthToTotalDays.length; ++month) {
+        if(eventDate < monthToTotalDays[month]) break;
+    }
+    let days = (eventDate - monthToTotalDays[--month])+1;
+    startPos = days >= 10 ? 3 : 4;
+    base = base.substr(0, startPos) + `${days}` + base.substr(5);
+    startPos = month >= 10 ? 0 : 1;
+    base = base.substr(0, startPos) + `${month}` + base.substr(2);
+    return base;
+}
 function updateTableRowsInnerHTML(tableContainerDOM, eventList, idName) {
     finalInnerHTML = "";
     for(let i = 0; i < eventList.length; ++i) {
@@ -185,7 +217,7 @@ function updateTableRowsInnerHTML(tableContainerDOM, eventList, idName) {
             <td>${eventList[i].eventTitle}</td>
             <td>${eventList[i].state}</td>
             <td>${eventList[i].city}</td>
-            <td>${eventList[i].eventDate}</td>
+            <td>${eventNumDateToString(eventList[i].eventDate)}</td>
         </tr>
         `;
     }
