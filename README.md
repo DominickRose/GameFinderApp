@@ -16,5 +16,8 @@ The ISMADORO company recently designed an application allowing volleyball enthus
 * Mason Russell
 
 # See Also
+https://github.com/DominickRose/GameFinderAppTesting
+https://github.com/DominickRose/GameFinderAPI
+
 Link to wireframes, User stories and Requirements Traceability Matrix:
 https://drive.google.com/drive/folders/1GSIl16JHHoR4ibGuA9G8FN6fJMOumTNS?usp=sharing
